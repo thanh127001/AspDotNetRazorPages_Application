@@ -10,7 +10,7 @@ var databasePath = Path.Combine(builder.Environment.ContentRootPath, "Applicatio
 var connectionString = new SqliteConnectionStringBuilder
 {
     DataSource = databasePath,
-    Password = "Thanh@224"
+    Password = builder.Configuration["AccessCode"] ?? throw new InvalidOperationException("Missing AccessCode configuration.")
 }.ToString();
 
 builder.Services.AddDbContext<AppDbContext>(options =>
