@@ -1,4 +1,5 @@
 using Application.Data;
+using Application.Services;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 
@@ -7,10 +8,10 @@ namespace Application.Common;
 public sealed class AppDatabase
 {
     private readonly IServiceScopeFactory _scopes;
-    private readonly AppRuntime _runtime;
+    private readonly AppRuntimeService _runtime;
     private readonly SemaphoreSlim _gate = new(1, 1);
 
-    public AppDatabase(IServiceScopeFactory scopes, AppRuntime runtime)
+    public AppDatabase(IServiceScopeFactory scopes, AppRuntimeService runtime)
     {
         _scopes = scopes;
         _runtime = runtime;
