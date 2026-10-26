@@ -2,6 +2,7 @@ using System.ComponentModel.DataAnnotations;
 using Application.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.Data.Sqlite;
 
 namespace Application.Pages;
 
@@ -20,12 +21,16 @@ public class InitiationModel : PageModel
     [Display(Name = "Access Code")]
     public string AccessCode { get; set; } = string.Empty;
 
+    public bool IsLocked => _runtime.IsInitiationLocked;
+
     public IActionResult OnGet() => _runtime.IsInitialized ? RedirectToPage("/Index") : Page();
 
     public async Task<IActionResult> OnPostAsync(CancellationToken cancellationToken)
     {
         if (_runtime.IsInitialized) return RedirectToPage("/Index");
+        if (IsLocked) return Page();
         if (!ModelState.IsValid) return Page();
+
         try
         {
             await _database.InitializeAsync(AccessCode, cancellationToken);
@@ -33,7 +38,12 @@ public class InitiationModel : PageModel
         }
         catch (Exception ex) when (ex is SqliteException or InvalidOperationException)
         {
-            ModelState.AddModelError(string.Empty, "Could not open or initialize the database. Check the access code and SQLCipher configuration.");
+            _runtime.RegisterFailedInitiation();
+            if (!IsLocked)
+            {
+                ModelState.AddModelError(string.Empty,
+                    $"Could not initialize the database. {_runtime.RemainingInitiationAttempts} attempt(s) remaining.");
+            }
             return Page();
         }
     }
