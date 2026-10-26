@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using Application.Common;
+using Application.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
@@ -7,10 +8,10 @@ namespace Application.Pages;
 
 public class InitiationModel : PageModel
 {
-    private readonly AppRuntime _runtime;
+    private readonly AppRuntimeService _runtime;
     private readonly AppDatabase _database;
 
-    public InitiationModel(AppRuntime runtime, AppDatabase database)
+    public InitiationModel(AppRuntimeService runtime, AppDatabase database)
     {
         _runtime = runtime;
         _database = database;
