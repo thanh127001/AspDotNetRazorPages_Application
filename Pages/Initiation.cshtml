@@ -1,0 +1,14 @@
+@page
+@model Application.Pages.InitiationModel
+@{
+    ViewData["Title"] = "Initiation";
+}
+<h1>Application Initiation</h1>
+<p>Enter the database access code to initialize the application.</p>
+<form method="post">
+    @Html.AntiForgeryToken()
+    <div asp-validation-summary="All" class="text-danger"></div>
+    <label asp-for="AccessCode"></label>
+    <input asp-for="AccessCode" type="password" autocomplete="new-password" class="form-control" required />
+    <button type="submit" class="btn btn-primary mt-3">Initialize Application</button>
+</form>
