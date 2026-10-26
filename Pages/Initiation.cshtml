@@ -1,43 +1,34 @@
 @page
 @model Application.Pages.InitiationModel
 @{
-    Layout = null;
     ViewData["Title"] = "Initiation";
 }
-<!doctype html>
-<html lang="en">
-<head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Initiation - Application</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css"
-          rel="stylesheet"
-          />
-</head>
-<body class="bg-light">
-    <main class="container min-vh-100 d-flex align-items-center justify-content-center py-4">
-        <div class="card shadow-sm border-0 w-100" style="max-width: 420px;">
-            <div class="card-body p-4 p-md-5">
-                <h1 class="h4 text-center mb-2">Application Initiation</h1>
-                <p class="text-muted text-center mb-4">
-                    Enter your access code to initialize the database.
-                </p>
-                <form method="post">
-                    @Html.AntiForgeryToken()
-                    <div asp-validation-summary="All" class="text-danger small mb-3"></div>
-                    <div class="mb-4">
-                        <label asp-for="AccessCode" class="form-label"></label>
-                        <input asp-for="AccessCode" type="password"
-                               class="form-control form-control-lg"
-                               autocomplete="new-password" required autofocus />
-                        <span asp-validation-for="AccessCode" class="text-danger small"></span>
-                    </div>
-                    <button type="submit" class="btn btn-primary btn-lg w-100">
-                        Initialize Application
-                    </button>
-                </form>
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-12 col-sm-10 col-md-8 col-lg-6 col-xl-5">
+            <div class="card shadow-sm">
+                <div class="card-body p-4">
+                    <h1 class="h4 text-center mb-2">Application Initiation</h1>
+                    <p class="text-muted text-center mb-4">
+                        Enter your access code to initialize the database.
+                    </p>
+                    <form method="post">
+                        @Html.AntiForgeryToken()
+                        <div asp-validation-summary="All" class="text-danger small mb-3"></div>
+                        <div class="mb-4">
+                            <label asp-for="AccessCode" class="form-label">Access Code</label>
+                            <input asp-for="AccessCode" type="password"
+                                   class="form-control"
+                                   autocomplete="new-password" required autofocus />
+                            <span asp-validation-for="AccessCode" class="text-danger small"></span>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">
+                            Initialize Application
+                        </button>
+                    </form>
+                </div>
             </div>
         </div>
-    </main>
-</body>
-</html>
+    </div>
+</div>
