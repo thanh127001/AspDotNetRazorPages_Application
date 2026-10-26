@@ -22,20 +22,29 @@
                         <p class="text-muted text-center mb-4">
                             Enter your access code to initialize the database.
                         </p>
-                        <form method="post">
-                            @Html.AntiForgeryToken()
-                            <div asp-validation-summary="All" class="text-danger small mb-3"></div>
-                            <div class="mb-4">
-                                <label asp-for="AccessCode" class="form-label">Access Code</label>
-                                <input asp-for="AccessCode" type="password"
-                                       class="form-control"
-                                       autocomplete="new-password" required autofocus />
-                                <span asp-validation-for="AccessCode" class="text-danger small"></span>
+                        @if (Model.IsLocked)
+                        {
+                            <div class="alert alert-danger" role="alert">
+                                Too many failed attempts. Application initiation is locked.
                             </div>
-                            <button type="submit" class="btn btn-primary w-100">
-                                Initialize Application
-                            </button>
-                        </form>
+                        }
+                        else
+                        {
+                            <form method="post">
+                                @Html.AntiForgeryToken()
+                                <div asp-validation-summary="All" class="text-danger small mb-3"></div>
+                                <div class="mb-4">
+                                    <label asp-for="AccessCode" class="form-label">Access Code</label>
+                                    <input asp-for="AccessCode" type="password"
+                                           class="form-control"
+                                           autocomplete="new-password" required autofocus />
+                                    <span asp-validation-for="AccessCode" class="text-danger small"></span>
+                                </div>
+                                <button type="submit" class="btn btn-primary w-100">
+                                    Initialize Application
+                                </button>
+                            </form>
+                        }
                     </div>
                 </div>
             </div>
