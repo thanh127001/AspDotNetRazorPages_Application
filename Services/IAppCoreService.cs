@@ -5,7 +5,6 @@ namespace Application.Services;
 public interface IAppCoreService
 {
     Task<AppResultModel<List<AppSettingModel>>> GetSettingsAsync(CancellationToken cancellationToken = default);
-    Task<string> GetSettingValueAsync(string? code, CancellationToken cancellationToken = default);
     Task<AppResultModel<AppSettingModel>> GetSettingAsync(string id, CancellationToken cancellationToken = default);
     Task<AppResultModel<string>> CreateSettingAsync(AppSettingModel input, CancellationToken cancellationToken = default);
     Task<AppResultModel<bool>> UpdateSettingAsync(AppSettingModel input, CancellationToken cancellationToken = default);
