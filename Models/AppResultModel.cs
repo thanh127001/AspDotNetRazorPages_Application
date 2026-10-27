@@ -4,7 +4,7 @@ public class AppResultModel<T>
 {
     public bool Success { get; set; }
     public string Code { get; set; } = string.Empty;
-    public List<string> Message { get; set; } = new();
+    public List<string> Messages { get; set; } = new();
     public T? Data { get; set; }
 
     public static AppResultModel<T> Ok(T data, params string[] messages)
@@ -13,7 +13,7 @@ public class AppResultModel<T>
         {
             Success = true,
             Code = "SUCCESS",
-            Message = messages.ToList(),
+            Messages = messages.ToList(),
             Data = data
         };
     }
@@ -24,7 +24,7 @@ public class AppResultModel<T>
         {
             Success = false,
             Code = code,
-            Message = messages.ToList(),
+            Messages = messages.ToList(),
             Data = default
         };
     }
