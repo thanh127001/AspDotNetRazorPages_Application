@@ -28,7 +28,6 @@ public sealed class AppCoreService : IAppCoreService
     private static AppUserModel ToModel(AppUser entity) => new()
     {
         Id = entity.Id,
-        Code = entity.Code,
         Username = entity.Username,
         Email = entity.Email,
         PhoneNumber = entity.PhoneNumber,
@@ -247,19 +246,10 @@ public sealed class AppCoreService : IAppCoreService
             {
                 return AppResultModel<string>.Fail("User data is required.");
             }
-            input.Code = input.Code?.Trim();
             input.Username = input.Username?.Trim() ?? string.Empty;
             input.Email = input.Email?.Trim();
             input.PhoneNumber = input.PhoneNumber?.Trim();
             var errors = new List<string>();
-            if (string.IsNullOrWhiteSpace(input.Code))
-            {
-                errors.Add("User code is required.");
-            }
-            else if (await _db.AppUsers.AnyAsync(x => x.Code == input.Code, cancellationToken))
-            {
-                errors.Add("User code already exists.");
-            }
             if (string.IsNullOrWhiteSpace(input.Username))
             {
                 errors.Add("Username is required.");
@@ -296,7 +286,7 @@ public sealed class AppCoreService : IAppCoreService
             {
                 return AppResultModel<string>.Fail(errors.ToArray());
             }
-            var entity = new AppUser { Id = AppIdGenerator.GenerateId(), Code = input.Code, Username = input.Username, Password = input.Password, Email = input.Email, PhoneNumber = input.PhoneNumber, Status = input.Status, Role = input.Role, DateCreated = DateTime.UtcNow, DateModified = DateTime.UtcNow };
+            var entity = new AppUser { Id = AppIdGenerator.GenerateId(), Username = input.Username, Password = input.Password, Email = input.Email, PhoneNumber = input.PhoneNumber, Status = input.Status, Role = input.Role, DateCreated = DateTime.UtcNow, DateModified = DateTime.UtcNow };
             _db.AppUsers.Add(entity);
             await _db.SaveChangesAsync(cancellationToken);
             return AppResultModel<string>.Ok(entity.Id, "User created successfully.");
@@ -320,19 +310,10 @@ public sealed class AppCoreService : IAppCoreService
             {
                 return AppResultModel<bool>.Fail("User ID is required.");
             }
-            input.Code = input.Code?.Trim();
             input.Username = input.Username?.Trim() ?? string.Empty;
             input.Email = input.Email?.Trim();
             input.PhoneNumber = input.PhoneNumber?.Trim();
             var errors = new List<string>();
-            if (string.IsNullOrWhiteSpace(input.Code))
-            {
-                errors.Add("User code is required.");
-            }
-            else if (await _db.AppUsers.AnyAsync(x => x.Code == input.Code && x.Id != input.Id, cancellationToken))
-            {
-                errors.Add("User code already exists.");
-            }
             if (string.IsNullOrWhiteSpace(input.Username))
             {
                 errors.Add("Username is required.");
@@ -389,7 +370,6 @@ public sealed class AppCoreService : IAppCoreService
                     return AppResultModel<bool>.Fail(errors.ToArray());
                 }
             }
-            entity.Code = input.Code;
             entity.Username = input.Username;
             entity.Email = input.Email;
             entity.PhoneNumber = input.PhoneNumber;
