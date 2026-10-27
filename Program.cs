@@ -47,22 +47,22 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.ExpireTimeSpan = TimeSpan.FromHours(24);
         options.SlidingExpiration = true;
     });
-builder.Services.AddSingleton<AppRuntimeService>();
-builder.Services.AddSingleton<AppDatabaseService>();
+builder.Services.AddSingleton<IAppRuntimeService, AppRuntimeService>();
+builder.Services.AddSingleton<IAppDatabaseService, AppDatabaseService>();
 builder.Services.AddScoped<IAppCoreService, AppCoreService>();
 builder.Services.AddDbContext<AppDbContext>((services, options) =>
 {
-    var runtimeState = services.GetRequiredService<AppRuntimeService>();
+    var runtimeState = services.GetRequiredService<IAppRuntimeService>();
     if (!runtimeState.IsInitialized)
         throw new InvalidOperationException("Application database is not initialized.");
     options.UseSqlite(AppDatabaseService.ConnectionString(runtimeState.AccessCode!));
 });
 
 var app = builder.Build();
-var runtime = app.Services.GetRequiredService<AppRuntimeService>();
+var runtime = app.Services.GetRequiredService<IAppRuntimeService>();
 if (runtime.AccessCode is { } startupCode)
 {
-    await app.Services.GetRequiredService<AppDatabaseService>().InitializeAsync(startupCode);
+    await app.Services.GetRequiredService<IAppDatabaseService>().InitializeAsync(startupCode);
 }
 
 if (!app.Environment.IsDevelopment())
