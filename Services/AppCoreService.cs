@@ -49,12 +49,12 @@ public sealed class AppCoreService : IAppCoreService
         catch (DbUpdateException ex)
         {
             _logger.LogError(ex, "GetSettingsAsync database error");
-            return AppResultModel<List<AppSettingModel>>.Fail("Unable to save or retrieve data. Please try again.");
+            return AppResultModel<List<AppSettingModel>>.Fail("Unable to save or retrieve data. Please try again.", ex.Message);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "GetSettingsAsync unexpected error");
-            return AppResultModel<List<AppSettingModel>>.Fail("An unexpected error occurred.");
+            return AppResultModel<List<AppSettingModel>>.Fail("An unexpected error occurred.", ex.Message);
         }
     }
 
@@ -74,12 +74,12 @@ public sealed class AppCoreService : IAppCoreService
         catch (DbUpdateException ex)
         {
             _logger.LogError(ex, "GetSettingAsync database error");
-            return AppResultModel<AppSettingModel>.Fail("Unable to save or retrieve data. Please try again.");
+            return AppResultModel<AppSettingModel>.Fail("Unable to save or retrieve data. Please try again.", ex.Message);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "GetSettingAsync unexpected error");
-            return AppResultModel<AppSettingModel>.Fail("An unexpected error occurred.");
+            return AppResultModel<AppSettingModel>.Fail("An unexpected error occurred.", ex.Message);
         }
     }
 
@@ -111,12 +111,12 @@ public sealed class AppCoreService : IAppCoreService
         catch (DbUpdateException ex)
         {
             _logger.LogError(ex, "CreateSettingAsync database error");
-            return AppResultModel<AppSettingModel>.Fail("Unable to save or retrieve data. Please try again.");
+            return AppResultModel<AppSettingModel>.Fail("Unable to save or retrieve data. Please try again.", ex.Message);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "CreateSettingAsync unexpected error");
-            return AppResultModel<AppSettingModel>.Fail("An unexpected error occurred.");
+            return AppResultModel<AppSettingModel>.Fail("An unexpected error occurred.", ex.Message);
         }
     }
 
@@ -151,12 +151,12 @@ public sealed class AppCoreService : IAppCoreService
         catch (DbUpdateException ex)
         {
             _logger.LogError(ex, "UpdateSettingAsync database error");
-            return AppResultModel<bool>.Fail("Unable to save or retrieve data. Please try again.");
+            return AppResultModel<bool>.Fail("Unable to save or retrieve data. Please try again.", ex.Message);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "UpdateSettingAsync unexpected error");
-            return AppResultModel<bool>.Fail("An unexpected error occurred.");
+            return AppResultModel<bool>.Fail("An unexpected error occurred.", ex.Message);
         }
     }
 
@@ -178,12 +178,12 @@ public sealed class AppCoreService : IAppCoreService
         catch (DbUpdateException ex)
         {
             _logger.LogError(ex, "DeleteSettingAsync database error");
-            return AppResultModel<bool>.Fail("Unable to save or retrieve data. Please try again.");
+            return AppResultModel<bool>.Fail("Unable to save or retrieve data. Please try again.", ex.Message);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "DeleteSettingAsync unexpected error");
-            return AppResultModel<bool>.Fail("An unexpected error occurred.");
+            return AppResultModel<bool>.Fail("An unexpected error occurred.", ex.Message);
         }
     }
 
@@ -197,12 +197,12 @@ public sealed class AppCoreService : IAppCoreService
         catch (DbUpdateException ex)
         {
             _logger.LogError(ex, "GetUsersAsync database error");
-            return AppResultModel<List<AppUserModel>>.Fail("Unable to save or retrieve data. Please try again.");
+            return AppResultModel<List<AppUserModel>>.Fail("Unable to save or retrieve data. Please try again.", ex.Message);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "GetUsersAsync unexpected error");
-            return AppResultModel<List<AppUserModel>>.Fail("An unexpected error occurred.");
+            return AppResultModel<List<AppUserModel>>.Fail("An unexpected error occurred.", ex.Message);
         }
     }
 
@@ -222,12 +222,12 @@ public sealed class AppCoreService : IAppCoreService
         catch (DbUpdateException ex)
         {
             _logger.LogError(ex, "GetUserAsync database error");
-            return AppResultModel<AppUserModel>.Fail("Unable to save or retrieve data. Please try again.");
+            return AppResultModel<AppUserModel>.Fail("Unable to save or retrieve data. Please try again.", ex.Message);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "GetUserAsync unexpected error");
-            return AppResultModel<AppUserModel>.Fail("An unexpected error occurred.");
+            return AppResultModel<AppUserModel>.Fail("An unexpected error occurred.", ex.Message);
         }
     }
 
@@ -265,12 +265,12 @@ public sealed class AppCoreService : IAppCoreService
         catch (DbUpdateException ex)
         {
             _logger.LogError(ex, "CreateUserAsync database error");
-            return AppResultModel<AppUserModel>.Fail("Unable to save or retrieve data. Please try again.");
+            return AppResultModel<AppUserModel>.Fail("Unable to save or retrieve data. Please try again.", ex.Message);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "CreateUserAsync unexpected error");
-            return AppResultModel<AppUserModel>.Fail("An unexpected error occurred.");
+            return AppResultModel<AppUserModel>.Fail("An unexpected error occurred.", ex.Message);
         }
     }
 
@@ -312,12 +312,12 @@ public sealed class AppCoreService : IAppCoreService
         catch (DbUpdateException ex)
         {
             _logger.LogError(ex, "UpdateUserAsync database error");
-            return AppResultModel<bool>.Fail("Unable to save or retrieve data. Please try again.");
+            return AppResultModel<bool>.Fail("Unable to save or retrieve data. Please try again.", ex.Message);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "UpdateUserAsync unexpected error");
-            return AppResultModel<bool>.Fail("An unexpected error occurred.");
+            return AppResultModel<bool>.Fail("An unexpected error occurred.", ex.Message);
         }
     }
 
@@ -339,12 +339,12 @@ public sealed class AppCoreService : IAppCoreService
         catch (DbUpdateException ex)
         {
             _logger.LogError(ex, "DeleteUserAsync database error");
-            return AppResultModel<bool>.Fail("Unable to save or retrieve data. Please try again.");
+            return AppResultModel<bool>.Fail("Unable to save or retrieve data. Please try again.", ex.Message);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "DeleteUserAsync unexpected error");
-            return AppResultModel<bool>.Fail("An unexpected error occurred.");
+            return AppResultModel<bool>.Fail("An unexpected error occurred.", ex.Message);
         }
     }
 }
