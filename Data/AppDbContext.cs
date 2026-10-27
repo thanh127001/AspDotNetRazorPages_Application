@@ -7,6 +7,7 @@ namespace Application.Data
         public DbSet<AppSetting> AppSettings { get; set; }
         public DbSet<AppUser> AppUsers { get; set; }
         public DbSet<AppContent> AppContents { get; set; }
+        public DbSet<AppFile> AppFiles { get; set; }
 
         public AppDbContext(DbContextOptions<AppDbContext> options)
             : base(options) { }
@@ -26,6 +27,12 @@ namespace Application.Data
                 entity.ToTable("AppUsers");
                 entity.HasKey(e => e.Id);
                 entity.HasIndex(x => x.Username).IsUnique();
+            });
+
+            modelBuilder.Entity<AppFile>(entity =>
+            {
+                entity.ToTable("AppFiles");
+                entity.HasKey(x => x.Id);
             });
 
             modelBuilder.Entity<AppContent>(entity =>
