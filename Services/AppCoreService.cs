@@ -9,11 +9,13 @@ public sealed class AppCoreService : IAppCoreService
 {
     private readonly AppDbContext _db;
     private readonly ILogger<AppCoreService> _logger;
+    private readonly IAppRuntimeService _runtime;
 
-    public AppCoreService(AppDbContext db, ILogger<AppCoreService> logger)
+    public AppCoreService(AppDbContext db, ILogger<AppCoreService> logger, IAppRuntimeService runtime)
     {
         _db = db;
         _logger = logger;
+        _runtime = runtime;
     }
 
     private static AppSettingModel ToModel(AppSetting entity) => new()
@@ -47,27 +49,9 @@ public sealed class AppCoreService : IAppCoreService
         }
     }
 
-    public async Task<string> GetSettingValueAsync(string? code, CancellationToken cancellationToken = default)
+    public Task<string> GetSettingValueAsync(string? code, CancellationToken cancellationToken = default)
     {
-        if (string.IsNullOrWhiteSpace(code))
-        {
-            return string.Empty;
-        }
-
-        try
-        {
-            var value = await _db.AppSettings.AsNoTracking()
-                .Where(x => x.Code == code.Trim())
-                .Select(x => x.Value)
-                .FirstOrDefaultAsync(cancellationToken);
-
-            return value ?? string.Empty;
-        }
-        catch (Exception ex)
-        {
-            AppErrorLog.Log(_logger, ex, nameof(GetSettingValueAsync));
-            return string.Empty;
-        }
+        return Task.FromResult(_runtime.GetSettingValue(code));
     }
 
     public async Task<AppResultModel<AppSettingModel>> GetSettingAsync(string id, CancellationToken cancellationToken = default)
@@ -130,6 +114,7 @@ public sealed class AppCoreService : IAppCoreService
             var entity = new AppSetting { Id = AppIdGenerator.GenerateId(), Code = input.Code, Name = input.Name, Value = input.Value, Order = input.Order };
             _db.AppSettings.Add(entity);
             await _db.SaveChangesAsync(cancellationToken);
+            _runtime.SetSettingValue(entity.Code, entity.Value);
             return AppResultModel<string>.Ok(entity.Id, "Setting created successfully.");
         }
         catch (Exception ex) when (ex is not OperationCanceledException || !cancellationToken.IsCancellationRequested)
@@ -178,6 +163,7 @@ public sealed class AppCoreService : IAppCoreService
             entity.Value = input.Value;
             entity.Order = input.Order;
             await _db.SaveChangesAsync(cancellationToken);
+            _runtime.SetSettingValue(entity.Code, entity.Value);
             return AppResultModel<bool>.Ok(true, "Setting updated successfully.");
         }
         catch (Exception ex) when (ex is not OperationCanceledException || !cancellationToken.IsCancellationRequested)
