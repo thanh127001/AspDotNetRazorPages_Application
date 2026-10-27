@@ -3,6 +3,7 @@ using Serilog.Events;
 using Application.Data;
 using Application.Services;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 SQLitePCL.Batteries_V2.Init();
 
@@ -19,6 +20,17 @@ builder.Host.UseSerilog((context, services, logger) => logger
         retainedFileCountLimit: 30,
         shared: true));
 builder.Services.AddRazorPages();
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options =>
+    {
+        options.LoginPath = "/Account/Index";
+        options.AccessDeniedPath = "/Account/Index";
+        options.Cookie.HttpOnly = true;
+        options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+        options.Cookie.SameSite = SameSiteMode.Lax;
+        options.ExpireTimeSpan = TimeSpan.FromHours(8);
+        options.SlidingExpiration = true;
+    });
 builder.Services.AddSingleton<AppRuntimeService>();
 builder.Services.AddSingleton<AppDatabaseService>();
 builder.Services.AddScoped<IAppCoreService, AppCoreService>();
@@ -76,6 +88,7 @@ app.Use(async (context, next) =>
     await next(context);
 });
 
+app.UseAuthentication();
 app.UseAuthorization();
 app.MapStaticAssets();
 app.MapRazorPages().WithStaticAssets();
