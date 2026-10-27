@@ -278,6 +278,14 @@ public sealed class AppCoreService : IAppCoreService
             {
                 errors.Add("Phone number is invalid.");
             }
+            if(!new[] { 0, 1 }.Contains(input.Status))
+            {
+                errors.Add("Status must be 0 (Inactive) or 1 (Active).");
+            }
+            if(!new[] { 0, 1, 2 }.Contains(input.Role))
+            {
+                errors.Add("Role must be 0 (User), 1 (Administrator), or 2 (Manager).");
+            }
             if (errors.Count > 0)
             {
                 return AppResultModel<string>.Fail(errors.ToArray());
@@ -338,6 +346,14 @@ public sealed class AppCoreService : IAppCoreService
             if (!string.IsNullOrWhiteSpace(input.PhoneNumber) && !new System.ComponentModel.DataAnnotations.PhoneAttribute().IsValid(input.PhoneNumber))
             {
                 errors.Add("Phone number is invalid.");
+            }
+            if(!new[] { 0, 1 }.Contains(input.Status))
+            {
+                errors.Add("Status must be 0 (Inactive) or 1 (Active).");
+            }
+            if(!new[] { 0, 1, 2 }.Contains(input.Role))
+            {
+                errors.Add("Role must be 0 (User), 1 (Administrator), or 2 (Manager).");
             }
             if (errors.Count > 0)
             {
