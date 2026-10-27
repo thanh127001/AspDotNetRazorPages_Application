@@ -29,7 +29,6 @@ public class IndexModel : PageModel
     {
         Mode = (mode ?? "List").ToLowerInvariant() switch
         {
-            "create" => "Create",
             "edit" => "Edit",
             "details" => "Details",
             _ => "List"
@@ -49,11 +48,6 @@ public class IndexModel : PageModel
             return Page();
         }
 
-        if (Mode == "Create")
-        {
-            return Page();
-        }
-
         if (string.IsNullOrWhiteSpace(id))
         {
             return RedirectToPage();
@@ -69,19 +63,6 @@ public class IndexModel : PageModel
         SelectedSetting = settingResult.Data;
         Input = settingResult.Data;
         return Page();
-    }
-
-    public async Task<IActionResult> OnPostCreateAsync(CancellationToken cancellationToken)
-    {
-        Mode = "Create";
-        var result = await _core.CreateSettingAsync(Input, cancellationToken);
-        if (!result.Success)
-        {
-            Messages = result.Messages;
-            return Page();
-        }
-        Notice = string.Join(" ", result.Messages);
-        return RedirectToPage();
     }
 
     public async Task<IActionResult> OnPostEditAsync(CancellationToken cancellationToken)
