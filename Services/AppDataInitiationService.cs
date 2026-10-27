@@ -6,9 +6,9 @@ public sealed class AppDataInitiationService : IAppDataInitiationService
 {
     private readonly IAppCoreService _core;
     private readonly IAppRuntimeService _runtime;
-    private readonly AppFileCacheService _fileCache;
+    private readonly IAppFileCacheService _fileCache;
 
-    public AppDataInitiationService(IAppCoreService core, IAppRuntimeService runtime, AppFileCacheService fileCache)
+    public AppDataInitiationService(IAppCoreService core, IAppRuntimeService runtime, IAppFileCacheService fileCache)
     {
         _core = core;
         _runtime = runtime;
