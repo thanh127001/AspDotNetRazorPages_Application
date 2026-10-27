@@ -3,7 +3,6 @@ namespace Application.Models;
 public class AppResultModel<T>
 {
     public bool Success { get; set; }
-    public string Code { get; set; } = string.Empty;
     public List<string> Messages { get; set; } = new();
     public T? Data { get; set; }
 
@@ -12,18 +11,16 @@ public class AppResultModel<T>
         return new AppResultModel<T>
         {
             Success = true,
-            Code = "SUCCESS",
             Messages = messages.ToList(),
             Data = data
         };
     }
 
-    public static AppResultModel<T> Fail(string code, params string[] messages)
+    public static AppResultModel<T> Fail(params string[] messages)
     {
         return new AppResultModel<T>
         {
             Success = false,
-            Code = code,
             Messages = messages.ToList(),
             Data = default
         };
