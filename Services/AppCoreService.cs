@@ -56,11 +56,13 @@ public sealed class AppCoreService : IAppCoreService
     {
         try
         {
-            if (string.IsNullOrWhiteSpace(id)) {
+            if (string.IsNullOrWhiteSpace(id))
+            {
                 return AppResultModel<AppSettingModel>.Fail("Setting ID is required.");
             }
             var entity = await _db.AppSettings.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
-            if (entity is null) {
+            if (entity is null)
+            {
                 return AppResultModel<AppSettingModel>.Fail("Setting not found.");
             }
             return AppResultModel<AppSettingModel>.Ok(ToModel(entity));
@@ -181,11 +183,13 @@ public sealed class AppCoreService : IAppCoreService
     {
         try
         {
-            if (string.IsNullOrWhiteSpace(id)) {
+            if (string.IsNullOrWhiteSpace(id))
+            {
                 return AppResultModel<bool>.Fail("Setting ID is required.");
             }
             var entity = await _db.AppSettings.FindAsync(new object[] { id }, cancellationToken);
-            if (entity is null) {
+            if (entity is null)
+            {
                 return AppResultModel<bool>.Fail("Setting not found.");
             }
             _db.AppSettings.Remove(entity);
@@ -217,11 +221,13 @@ public sealed class AppCoreService : IAppCoreService
     {
         try
         {
-            if (string.IsNullOrWhiteSpace(id)) {
+            if (string.IsNullOrWhiteSpace(id))
+            {
                 return AppResultModel<AppUserModel>.Fail("User ID is required.");
             }
             var entity = await _db.AppUsers.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
-            if (entity is null) {
+            if (entity is null)
+            {
                 return AppResultModel<AppUserModel>.Fail("User not found.");
             }
             return AppResultModel<AppUserModel>.Ok(ToModel(entity));
@@ -278,11 +284,11 @@ public sealed class AppCoreService : IAppCoreService
             {
                 errors.Add("Phone number is invalid.");
             }
-            if(!new[] { 0, 1 }.Contains(input.Status))
+            if (input.Status is not (0 or 1))
             {
                 errors.Add("Status must be 0 (Inactive) or 1 (Active).");
             }
-            if(!new[] { 0, 1, 2 }.Contains(input.Role))
+            if (input.Role is not (0 or 1 or 2))
             {
                 errors.Add("Role must be 0 (User), 1 (Administrator), or 2 (Manager).");
             }
@@ -347,11 +353,11 @@ public sealed class AppCoreService : IAppCoreService
             {
                 errors.Add("Phone number is invalid.");
             }
-            if(!new[] { 0, 1 }.Contains(input.Status))
+            if (input.Status is not (0 or 1))
             {
                 errors.Add("Status must be 0 (Inactive) or 1 (Active).");
             }
-            if(!new[] { 0, 1, 2 }.Contains(input.Role))
+            if (input.Role is not (0 or 1 or 2))
             {
                 errors.Add("Role must be 0 (User), 1 (Administrator), or 2 (Manager).");
             }
@@ -389,11 +395,13 @@ public sealed class AppCoreService : IAppCoreService
     {
         try
         {
-            if (string.IsNullOrWhiteSpace(id)) {
+            if (string.IsNullOrWhiteSpace(id))
+            {
                 return AppResultModel<bool>.Fail("User ID is required.");
             }
             var entity = await _db.AppUsers.FindAsync(new object[] { id }, cancellationToken);
-            if (entity is null) {
+            if (entity is null)
+            {
                 return AppResultModel<bool>.Fail("User not found.");
             }
             _db.AppUsers.Remove(entity);
