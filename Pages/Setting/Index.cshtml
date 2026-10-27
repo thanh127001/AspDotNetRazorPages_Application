@@ -7,11 +7,7 @@
 <div class="container py-4">
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h1 class="h3 mb-0">Settings / @Model.Mode</h1>
-        @if (Model.Mode == "List")
-        {
-            <a asp-page="./Index" asp-route-mode="Create" class="btn btn-primary">Create setting</a>
-        }
-        else
+        @if (Model.Mode != "List")
         {
             <a asp-page="./Index" class="btn btn-outline-secondary">Back to list</a>
         }
@@ -69,24 +65,14 @@
             <dt class="col-sm-3">Order</dt><dd class="col-sm-9">@Model.SelectedSetting.Order</dd>
         </dl>
     }
-    else if (Model.Mode == "Create" || Model.Mode == "Edit")
+    else if (Model.Mode == "Edit")
     {
-        <form method="post" asp-page-handler="@(Model.Mode == "Create" ? "Create" : "Edit")">
+        <form method="post" asp-page-handler="Edit">
             <input type="hidden" asp-for="Input.Id" />
-            @if (Model.Mode == "Create")
-            {
-                <div class="mb-3">
-                    <label asp-for="Input.Code" class="form-label">Code</label>
-                    <input asp-for="Input.Code" class="form-control" required />
-                </div>
-            }
-            else
-            {
-                <div class="mb-3">
+            <div class="mb-3">
                     <label class="form-label">Code</label>
                     <input class="form-control" value="@Model.Input.Code" readonly />
-                </div>
-            }
+            </div>
             <div class="mb-3">
                 <label asp-for="Input.Name" class="form-label">Name</label>
                 <input asp-for="Input.Name" class="form-control" required />
