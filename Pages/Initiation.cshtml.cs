@@ -8,10 +8,10 @@ namespace Application.Pages;
 
 public class InitiationModel : PageModel
 {
-    private readonly AppRuntimeService _runtime;
-    private readonly AppDatabaseService _database;
+    private readonly IAppRuntimeService _runtime;
+    private readonly IAppDatabaseService _database;
 
-    public InitiationModel(AppRuntimeService runtime, AppDatabaseService database)
+    public InitiationModel(IAppRuntimeService runtime, IAppDatabaseService database)
     {
         _runtime = runtime;
         _database = database;
