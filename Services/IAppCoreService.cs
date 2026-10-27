@@ -4,6 +4,12 @@ namespace Application.Services;
 
 public interface IAppCoreService
 {
+    Task<AppResultModel<List<AppFileModel>>> GetFilesAsync(CancellationToken cancellationToken = default);
+    Task<AppResultModel<AppFileModel>> GetFileAsync(string id, CancellationToken cancellationToken = default);
+    Task<AppResultModel<string>> CreateFileAsync(AppFileModel input, CancellationToken cancellationToken = default);
+    Task<AppResultModel<bool>> UpdateFileAsync(string id, string fileName, CancellationToken cancellationToken = default);
+    Task<AppResultModel<bool>> DeleteFileAsync(string id, CancellationToken cancellationToken = default);
+
     Task<AppResultModel<List<AppSettingModel>>> GetSettingsAsync(CancellationToken cancellationToken = default);
     Task<AppResultModel<AppSettingModel>> GetSettingAsync(string id, CancellationToken cancellationToken = default);
     Task<AppResultModel<string>> CreateSettingAsync(AppSettingModel input, CancellationToken cancellationToken = default);
