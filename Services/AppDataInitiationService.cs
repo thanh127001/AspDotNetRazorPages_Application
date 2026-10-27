@@ -5,10 +5,12 @@ namespace Application.Services;
 public sealed class AppDataInitiationService : IAppDataInitiationService
 {
     private readonly IAppCoreService _core;
+    private readonly IAppRuntimeService _runtime;
 
-    public AppDataInitiationService(IAppCoreService core)
+    public AppDataInitiationService(IAppCoreService core, IAppRuntimeService runtime)
     {
         _core = core;
+        _runtime = runtime;
     }
 
     public async Task InitializeAsync(
@@ -24,6 +26,10 @@ public sealed class AppDataInitiationService : IAppDataInitiationService
 
         await InitializeAdministratorAsync(administratorPassword, cancellationToken);
         await InitializeSettingsAsync(cancellationToken);
+        var settings = await _core.GetSettingsAsync(cancellationToken);
+        if (!settings.Success || settings.Data is null)
+            throw new InvalidOperationException(string.Join(" ", settings.Messages));
+        _runtime.SetSettings(settings.Data);
     }
 
     private async Task InitializeAdministratorAsync(
