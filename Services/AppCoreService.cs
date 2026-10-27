@@ -1,7 +1,6 @@
 using Application.Common;
 using Application.Data;
 using Application.Models;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace Application.Services;
@@ -9,12 +8,10 @@ namespace Application.Services;
 public sealed class AppCoreService : IAppCoreService
 {
     private readonly AppDbContext _db;
-    private readonly IPasswordHasher<AppUser> _passwordHasher;
 
-    public AppCoreService(AppDbContext db, IPasswordHasher<AppUser> passwordHasher)
+    public AppCoreService(AppDbContext db)
     {
         _db = db;
-        _passwordHasher = passwordHasher;
     }
 
     private static AppSettingModel ToModel(AppSetting entity) => new()
@@ -31,7 +28,7 @@ public sealed class AppCoreService : IAppCoreService
         Id = entity.Id,
         Code = entity.Code,
         Username = entity.Username,
-        Password = string.Empty, // Never expose the stored password hash.
+        Password = entity.Password,
         Email = entity.Email,
         PhoneNumber = entity.PhoneNumber,
         Status = entity.Status,
@@ -118,7 +115,7 @@ public sealed class AppCoreService : IAppCoreService
             DateCreated = DateTime.UtcNow,
             DateModified = DateTime.UtcNow
         };
-        entity.Password = _passwordHasher.HashPassword(entity, model.Password);
+        entity.Password = model.Password;
         _db.AppUsers.Add(entity);
         await _db.SaveChangesAsync();
         return ToModel(entity);
@@ -137,7 +134,7 @@ public sealed class AppCoreService : IAppCoreService
         entity.Status = model.Status;
         entity.Role = model.Role;
         if (!string.IsNullOrWhiteSpace(model.Password))
-            entity.Password = _passwordHasher.HashPassword(entity, model.Password);
+            entity.Password = model.Password;
         entity.DateModified = DateTime.UtcNow;
         await _db.SaveChangesAsync();
         return true;
