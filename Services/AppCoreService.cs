@@ -42,8 +42,8 @@ public sealed class AppCoreService : IAppCoreService
     {
         try
         {
-            var rows = await _db.AppSettings.AsNoTracking().OrderBy(x => x.Order).ThenBy(x => x.Name).ToListAsync();
-            return AppResultModel<List<AppSettingModel>>.Ok(rows.Select(ToModel).ToList());
+            var entities = await _db.AppSettings.AsNoTracking().OrderBy(x => x.Order).ThenBy(x => x.Name).ToListAsync();
+            return AppResultModel<List<AppSettingModel>>.Ok(entities.Select(ToModel).ToList());
         }
         catch (Exception ex)
         {
@@ -59,11 +59,11 @@ public sealed class AppCoreService : IAppCoreService
             if (string.IsNullOrWhiteSpace(id)) {
                 return AppResultModel<AppSettingModel>.Fail("Setting ID is required.");
             }
-            var row = await _db.AppSettings.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
-            if (row is null) {
+            var entity = await _db.AppSettings.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
+            if (entity is null) {
                 return AppResultModel<AppSettingModel>.Fail("Setting not found.");
             }
-            return AppResultModel<AppSettingModel>.Ok(ToModel(row));
+            return AppResultModel<AppSettingModel>.Ok(ToModel(entity));
         }
         catch (Exception ex)
         {
@@ -72,34 +72,34 @@ public sealed class AppCoreService : IAppCoreService
         }
     }
 
-    public async Task<AppResultModel<string>> CreateSettingAsync(AppSettingModel model)
+    public async Task<AppResultModel<string>> CreateSettingAsync(AppSettingModel input)
     {
         try
         {
-            if (model is null)
+            if (input is null)
             {
                 return AppResultModel<string>.Fail("Setting data is required.");
             }
-            model.Code = model.Code?.Trim();
-            model.Name = model.Name?.Trim();
+            input.Code = input.Code?.Trim();
+            input.Name = input.Name?.Trim();
             var errors = new List<string>();
-            if (string.IsNullOrWhiteSpace(model.Code))
+            if (string.IsNullOrWhiteSpace(input.Code))
             {
                 errors.Add("Setting code is required.");
             }
-            else if (await _db.AppSettings.AnyAsync(x => x.Code == model.Code))
+            else if (await _db.AppSettings.AnyAsync(x => x.Code == input.Code))
             {
                 errors.Add("Setting code already exists.");
             }
-            if (string.IsNullOrWhiteSpace(model.Name))
+            if (string.IsNullOrWhiteSpace(input.Name))
             {
                 errors.Add("Setting name is required.");
             }
-            else if (await _db.AppSettings.AnyAsync(x => x.Name == model.Name))
+            else if (await _db.AppSettings.AnyAsync(x => x.Name == input.Name))
             {
                 errors.Add("Setting name already exists.");
             }
-            if (model.Value is null)
+            if (input.Value is null)
             {
                 errors.Add("Setting value is required.");
             }
@@ -107,7 +107,7 @@ public sealed class AppCoreService : IAppCoreService
             {
                 return AppResultModel<string>.Fail(errors.ToArray());
             }
-            var entity = new AppSetting { Id = AppIdGenerator.GenerateId(), Code = model.Code, Name = model.Name, Value = model.Value, Order = model.Order };
+            var entity = new AppSetting { Id = AppIdGenerator.GenerateId(), Code = input.Code, Name = input.Name, Value = input.Value, Order = input.Order };
             _db.AppSettings.Add(entity);
             await _db.SaveChangesAsync();
             return AppResultModel<string>.Ok(entity.Id, "Setting created successfully.");
@@ -119,38 +119,38 @@ public sealed class AppCoreService : IAppCoreService
         }
     }
 
-    public async Task<AppResultModel<bool>> UpdateSettingAsync(AppSettingModel model)
+    public async Task<AppResultModel<bool>> UpdateSettingAsync(AppSettingModel input)
     {
         try
         {
-            if (model is null)
+            if (input is null)
             {
                 return AppResultModel<bool>.Fail("Setting data is required.");
             }
-            if (string.IsNullOrWhiteSpace(model.Id))
+            if (string.IsNullOrWhiteSpace(input.Id))
             {
                 return AppResultModel<bool>.Fail("Setting ID is required.");
             }
-            model.Code = model.Code?.Trim();
-            model.Name = model.Name?.Trim();
+            input.Code = input.Code?.Trim();
+            input.Name = input.Name?.Trim();
             var errors = new List<string>();
-            if (string.IsNullOrWhiteSpace(model.Code))
+            if (string.IsNullOrWhiteSpace(input.Code))
             {
                 errors.Add("Setting code is required.");
             }
-            else if (await _db.AppSettings.AnyAsync(x => x.Code == model.Code && x.Id != model.Id))
+            else if (await _db.AppSettings.AnyAsync(x => x.Code == input.Code && x.Id != input.Id))
             {
                 errors.Add("Setting code already exists.");
             }
-            if (string.IsNullOrWhiteSpace(model.Name))
+            if (string.IsNullOrWhiteSpace(input.Name))
             {
                 errors.Add("Setting name is required.");
             }
-            else if (await _db.AppSettings.AnyAsync(x => x.Name == model.Name && x.Id != model.Id))
+            else if (await _db.AppSettings.AnyAsync(x => x.Name == input.Name && x.Id != input.Id))
             {
                 errors.Add("Setting name already exists.");
             }
-            if (model.Value is null)
+            if (input.Value is null)
             {
                 errors.Add("Setting value is required.");
             }
@@ -158,15 +158,15 @@ public sealed class AppCoreService : IAppCoreService
             {
                 return AppResultModel<bool>.Fail(errors.ToArray());
             }
-            var entity = await _db.AppSettings.FindAsync(model.Id);
+            var entity = await _db.AppSettings.FindAsync(input.Id);
             if (entity is null)
             {
                 return AppResultModel<bool>.Fail("Setting not found.");
             }
-            entity.Code = model.Code;
-            entity.Name = model.Name;
-            entity.Value = model.Value;
-            entity.Order = model.Order;
+            entity.Code = input.Code;
+            entity.Name = input.Name;
+            entity.Value = input.Value;
+            entity.Order = input.Order;
             await _db.SaveChangesAsync();
             return AppResultModel<bool>.Ok(true, "Setting updated successfully.");
         }
@@ -184,11 +184,11 @@ public sealed class AppCoreService : IAppCoreService
             if (string.IsNullOrWhiteSpace(id)) {
                 return AppResultModel<bool>.Fail("Setting ID is required.");
             }
-            var row = await _db.AppSettings.FindAsync(id);
-            if (row is null) {
+            var entity = await _db.AppSettings.FindAsync(id);
+            if (entity is null) {
                 return AppResultModel<bool>.Fail("Setting not found.");
             }
-            _db.AppSettings.Remove(row);
+            _db.AppSettings.Remove(entity);
             await _db.SaveChangesAsync();
             return AppResultModel<bool>.Ok(true, "Setting deleted successfully.");
         }
@@ -203,8 +203,8 @@ public sealed class AppCoreService : IAppCoreService
     {
         try
         {
-            var rows = await _db.AppUsers.AsNoTracking().OrderBy(x => x.Username).ToListAsync();
-            return AppResultModel<List<AppUserModel>>.Ok(rows.Select(ToModel).ToList());
+            var entities = await _db.AppUsers.AsNoTracking().OrderBy(x => x.Username).ToListAsync();
+            return AppResultModel<List<AppUserModel>>.Ok(entities.Select(ToModel).ToList());
         }
         catch (Exception ex)
         {
@@ -220,11 +220,11 @@ public sealed class AppCoreService : IAppCoreService
             if (string.IsNullOrWhiteSpace(id)) {
                 return AppResultModel<AppUserModel>.Fail("User ID is required.");
             }
-            var row = await _db.AppUsers.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
-            if (row is null) {
+            var entity = await _db.AppUsers.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
+            if (entity is null) {
                 return AppResultModel<AppUserModel>.Fail("User not found.");
             }
-            return AppResultModel<AppUserModel>.Ok(ToModel(row));
+            return AppResultModel<AppUserModel>.Ok(ToModel(entity));
         }
         catch (Exception ex)
         {
@@ -233,48 +233,48 @@ public sealed class AppCoreService : IAppCoreService
         }
     }
 
-    public async Task<AppResultModel<string>> CreateUserAsync(AppUserModel model)
+    public async Task<AppResultModel<string>> CreateUserAsync(AppUserModel input)
     {
         try
         {
-            if (model is null)
+            if (input is null)
             {
                 return AppResultModel<string>.Fail("User data is required.");
             }
-            model.Code = model.Code?.Trim();
-            model.Username = model.Username?.Trim() ?? string.Empty;
-            model.Email = model.Email?.Trim();
-            model.PhoneNumber = model.PhoneNumber?.Trim();
+            input.Code = input.Code?.Trim();
+            input.Username = input.Username?.Trim() ?? string.Empty;
+            input.Email = input.Email?.Trim();
+            input.PhoneNumber = input.PhoneNumber?.Trim();
             var errors = new List<string>();
-            if (string.IsNullOrWhiteSpace(model.Code))
+            if (string.IsNullOrWhiteSpace(input.Code))
             {
                 errors.Add("User code is required.");
             }
-            else if (await _db.AppUsers.AnyAsync(x => x.Code == model.Code))
+            else if (await _db.AppUsers.AnyAsync(x => x.Code == input.Code))
             {
                 errors.Add("User code already exists.");
             }
-            if (string.IsNullOrWhiteSpace(model.Username))
+            if (string.IsNullOrWhiteSpace(input.Username))
             {
                 errors.Add("Username is required.");
             }
-            else if (await _db.AppUsers.AnyAsync(x => x.Username == model.Username))
+            else if (await _db.AppUsers.AnyAsync(x => x.Username == input.Username))
             {
                 errors.Add("Username already exists.");
             }
-            if (string.IsNullOrWhiteSpace(model.Password))
+            if (string.IsNullOrWhiteSpace(input.Password))
             {
                 errors.Add("Password is required.");
             }
-            else if (model.Password.Length < 6)
+            else if (input.Password.Length < 6)
             {
                 errors.Add("Password must be at least 6 characters long.");
             }
-            if (!string.IsNullOrWhiteSpace(model.Email) && !new System.ComponentModel.DataAnnotations.EmailAddressAttribute().IsValid(model.Email))
+            if (!string.IsNullOrWhiteSpace(input.Email) && !new System.ComponentModel.DataAnnotations.EmailAddressAttribute().IsValid(input.Email))
             {
                 errors.Add("Email is invalid.");
             }
-            if (!string.IsNullOrWhiteSpace(model.PhoneNumber) && !new System.ComponentModel.DataAnnotations.PhoneAttribute().IsValid(model.PhoneNumber))
+            if (!string.IsNullOrWhiteSpace(input.PhoneNumber) && !new System.ComponentModel.DataAnnotations.PhoneAttribute().IsValid(input.PhoneNumber))
             {
                 errors.Add("Phone number is invalid.");
             }
@@ -282,7 +282,7 @@ public sealed class AppCoreService : IAppCoreService
             {
                 return AppResultModel<string>.Fail(errors.ToArray());
             }
-            var entity = new AppUser { Id = AppIdGenerator.GenerateId(), Code = model.Code, Username = model.Username, Password = model.Password, Email = model.Email, PhoneNumber = model.PhoneNumber, Status = model.Status, Role = model.Role, DateCreated = DateTime.UtcNow, DateModified = DateTime.UtcNow };
+            var entity = new AppUser { Id = AppIdGenerator.GenerateId(), Code = input.Code, Username = input.Username, Password = input.Password, Email = input.Email, PhoneNumber = input.PhoneNumber, Status = input.Status, Role = input.Role, DateCreated = DateTime.UtcNow, DateModified = DateTime.UtcNow };
             _db.AppUsers.Add(entity);
             await _db.SaveChangesAsync();
             return AppResultModel<string>.Ok(entity.Id, "User created successfully.");
@@ -294,48 +294,48 @@ public sealed class AppCoreService : IAppCoreService
         }
     }
 
-    public async Task<AppResultModel<bool>> UpdateUserAsync(AppUserModel model)
+    public async Task<AppResultModel<bool>> UpdateUserAsync(AppUserModel input)
     {
         try
         {
-            if (model is null)
+            if (input is null)
             {
                 return AppResultModel<bool>.Fail("User data is required.");
             }
-            if (string.IsNullOrWhiteSpace(model.Id))
+            if (string.IsNullOrWhiteSpace(input.Id))
             {
                 return AppResultModel<bool>.Fail("User ID is required.");
             }
-            model.Code = model.Code?.Trim();
-            model.Username = model.Username?.Trim() ?? string.Empty;
-            model.Email = model.Email?.Trim();
-            model.PhoneNumber = model.PhoneNumber?.Trim();
+            input.Code = input.Code?.Trim();
+            input.Username = input.Username?.Trim() ?? string.Empty;
+            input.Email = input.Email?.Trim();
+            input.PhoneNumber = input.PhoneNumber?.Trim();
             var errors = new List<string>();
-            if (string.IsNullOrWhiteSpace(model.Code))
+            if (string.IsNullOrWhiteSpace(input.Code))
             {
                 errors.Add("User code is required.");
             }
-            else if (await _db.AppUsers.AnyAsync(x => x.Code == model.Code && x.Id != model.Id))
+            else if (await _db.AppUsers.AnyAsync(x => x.Code == input.Code && x.Id != input.Id))
             {
                 errors.Add("User code already exists.");
             }
-            if (string.IsNullOrWhiteSpace(model.Username))
+            if (string.IsNullOrWhiteSpace(input.Username))
             {
                 errors.Add("Username is required.");
             }
-            else if (await _db.AppUsers.AnyAsync(x => x.Username == model.Username && x.Id != model.Id))
+            else if (await _db.AppUsers.AnyAsync(x => x.Username == input.Username && x.Id != input.Id))
             {
                 errors.Add("Username already exists.");
             }
-            if (!string.IsNullOrWhiteSpace(model.Password) && model.Password.Length < 6)
+            if (!string.IsNullOrWhiteSpace(input.Password) && input.Password.Length < 6)
             {
                 errors.Add("Password must be at least 6 characters long.");
             }
-            if (!string.IsNullOrWhiteSpace(model.Email) && !new System.ComponentModel.DataAnnotations.EmailAddressAttribute().IsValid(model.Email))
+            if (!string.IsNullOrWhiteSpace(input.Email) && !new System.ComponentModel.DataAnnotations.EmailAddressAttribute().IsValid(input.Email))
             {
                 errors.Add("Email is invalid.");
             }
-            if (!string.IsNullOrWhiteSpace(model.PhoneNumber) && !new System.ComponentModel.DataAnnotations.PhoneAttribute().IsValid(model.PhoneNumber))
+            if (!string.IsNullOrWhiteSpace(input.PhoneNumber) && !new System.ComponentModel.DataAnnotations.PhoneAttribute().IsValid(input.PhoneNumber))
             {
                 errors.Add("Phone number is invalid.");
             }
@@ -343,20 +343,20 @@ public sealed class AppCoreService : IAppCoreService
             {
                 return AppResultModel<bool>.Fail(errors.ToArray());
             }
-            var entity = await _db.AppUsers.FindAsync(model.Id);
+            var entity = await _db.AppUsers.FindAsync(input.Id);
             if (entity is null)
             {
                 return AppResultModel<bool>.Fail("User not found.");
             }
-            entity.Code = model.Code;
-            entity.Username = model.Username;
-            entity.Email = model.Email;
-            entity.PhoneNumber = model.PhoneNumber;
-            entity.Status = model.Status;
-            entity.Role = model.Role;
-            if (!string.IsNullOrWhiteSpace(model.Password))
+            entity.Code = input.Code;
+            entity.Username = input.Username;
+            entity.Email = input.Email;
+            entity.PhoneNumber = input.PhoneNumber;
+            entity.Status = input.Status;
+            entity.Role = input.Role;
+            if (!string.IsNullOrWhiteSpace(input.Password))
             {
-                entity.Password = model.Password;
+                entity.Password = input.Password;
             }
             entity.DateModified = DateTime.UtcNow;
             await _db.SaveChangesAsync();
@@ -376,11 +376,11 @@ public sealed class AppCoreService : IAppCoreService
             if (string.IsNullOrWhiteSpace(id)) {
                 return AppResultModel<bool>.Fail("User ID is required.");
             }
-            var row = await _db.AppUsers.FindAsync(id);
-            if (row is null) {
+            var entity = await _db.AppUsers.FindAsync(id);
+            if (entity is null) {
                 return AppResultModel<bool>.Fail("User not found.");
             }
-            _db.AppUsers.Remove(row);
+            _db.AppUsers.Remove(entity);
             await _db.SaveChangesAsync();
             return AppResultModel<bool>.Ok(true, "User deleted successfully.");
         }
