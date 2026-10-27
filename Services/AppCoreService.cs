@@ -132,17 +132,8 @@ public sealed class AppCoreService : IAppCoreService
             {
                 return AppResultModel<bool>.Fail("Setting ID is required.");
             }
-            input.Code = input.Code?.Trim();
             input.Name = input.Name?.Trim();
             var errors = new List<string>();
-            if (string.IsNullOrWhiteSpace(input.Code))
-            {
-                errors.Add("Setting code is required.");
-            }
-            else if (await _db.AppSettings.AnyAsync(x => x.Code == input.Code && x.Id != input.Id, cancellationToken))
-            {
-                errors.Add("Setting code already exists.");
-            }
             if (string.IsNullOrWhiteSpace(input.Name))
             {
                 errors.Add("Setting name is required.");
@@ -164,7 +155,6 @@ public sealed class AppCoreService : IAppCoreService
             {
                 return AppResultModel<bool>.Fail("Setting not found.");
             }
-            entity.Code = input.Code;
             entity.Name = input.Name;
             entity.Value = input.Value;
             entity.Order = input.Order;
@@ -174,30 +164,6 @@ public sealed class AppCoreService : IAppCoreService
         catch (Exception ex) when (ex is not OperationCanceledException || !cancellationToken.IsCancellationRequested)
         {
             var errorId = AppErrorLog.Log(_logger, ex, nameof(UpdateSettingAsync));
-            return AppResultModel<bool>.Fail($"An error occurred while processing the request. Error ID: {errorId}");
-        }
-    }
-
-    public async Task<AppResultModel<bool>> DeleteSettingAsync(string id, CancellationToken cancellationToken = default)
-    {
-        try
-        {
-            if (string.IsNullOrWhiteSpace(id))
-            {
-                return AppResultModel<bool>.Fail("Setting ID is required.");
-            }
-            var entity = await _db.AppSettings.FindAsync(new object[] { id }, cancellationToken);
-            if (entity is null)
-            {
-                return AppResultModel<bool>.Fail("Setting not found.");
-            }
-            _db.AppSettings.Remove(entity);
-            await _db.SaveChangesAsync(cancellationToken);
-            return AppResultModel<bool>.Ok(true, "Setting deleted successfully.");
-        }
-        catch (Exception ex) when (ex is not OperationCanceledException || !cancellationToken.IsCancellationRequested)
-        {
-            var errorId = AppErrorLog.Log(_logger, ex, nameof(DeleteSettingAsync));
             return AppResultModel<bool>.Fail($"An error occurred while processing the request. Error ID: {errorId}");
         }
     }
