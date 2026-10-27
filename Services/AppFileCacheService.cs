@@ -16,19 +16,15 @@ public sealed class AppFileCacheService : IAppFileCacheService
 
     public static string GetUrl(string id, string fileName)
     {
-        var extension = Path.GetExtension(fileName).ToLowerInvariant();
-        return "/files/" + Uri.EscapeDataString(id) + extension;
+        return "/files/" + Uri.EscapeDataString(fileName);
     }
 
-    private string GetPath(string id, string fileName)
+    private string GetPath(string fileName)
     {
-        // File names are generated from database IDs, never from untrusted upload names.
-        var extension = Path.GetExtension(fileName).ToLowerInvariant();
-        if (extension is not (".png" or ".jpg" or ".jpeg" or ".txt" or ".pdf"))
-            throw new InvalidOperationException("Unsupported file extension.");
-        if (string.IsNullOrEmpty(id) || id.Any(c => !char.IsLetterOrDigit(c) && c != '-' && c != '_'))
-            throw new InvalidOperationException("Invalid file ID.");
-        return Path.Combine(_directory, id + extension);
+        if (string.IsNullOrWhiteSpace(fileName) || fileName != Path.GetFileName(fileName) ||
+            fileName is "." or ".." || fileName.IndexOfAny(new[] { '/', '\\', ':' }) >= 0)
+            throw new InvalidOperationException("Invalid file name.");
+        return Path.Combine(_directory, fileName);
     }
 
     public async Task SyncAsync(string id, CancellationToken cancellationToken = default)
@@ -36,7 +32,7 @@ public sealed class AppFileCacheService : IAppFileCacheService
         var file = await _db.AppFiles.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
         if (file is null) return;
         Directory.CreateDirectory(_directory);
-        var path = GetPath(file.Id, file.FileName);
+        var path = GetPath(file.FileName);
         if (System.IO.File.Exists(path))
         {
             var info = new FileInfo(path);
@@ -56,7 +52,7 @@ public sealed class AppFileCacheService : IAppFileCacheService
 
     public Task DeleteAsync(string id, string fileName)
     {
-        var path = GetPath(id, fileName);
+        var path = GetPath(fileName);
         if (System.IO.File.Exists(path)) System.IO.File.Delete(path);
         return Task.CompletedTask;
     }
@@ -69,7 +65,7 @@ public sealed class AppFileCacheService : IAppFileCacheService
             .ToListAsync(cancellationToken);
         foreach (var file in files)
         {
-            var path = GetPath(file.Id, file.FileName);
+            var path = GetPath(file.FileName);
             if (!System.IO.File.Exists(path) || new FileInfo(path).Length != file.FileSize)
                 await SyncAsync(file.Id, cancellationToken);
         }
