@@ -51,7 +51,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 builder.Services.AddSingleton<IAppRuntimeService, AppRuntimeService>();
 builder.Services.AddSingleton<IAppDatabaseService, AppDatabaseService>();
 builder.Services.AddScoped<IAppCoreService, AppCoreService>();
-builder.Services.AddScoped<AppFileCacheService>();
+builder.Services.AddScoped<IAppFileCacheService, AppFileCacheService>();
 builder.Services.AddScoped<IAppDataInitiationService, AppDataInitiationService>();
 builder.Services.AddDbContext<AppDbContext>((services, options) =>
 {
