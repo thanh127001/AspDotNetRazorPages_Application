@@ -65,6 +65,7 @@ public class IndexModel : PageModel
 
     public async Task<IActionResult> OnPostEditAsync(CancellationToken cancellationToken)
     {
+        var original = await _core.GetFileAsync(Id, cancellationToken);
         var result = await _core.UpdateFileAsync(Id, FileName, cancellationToken);
         if (!result.Success)
         {
@@ -72,6 +73,9 @@ public class IndexModel : PageModel
             await LoadAsync(cancellationToken);
             return Page();
         }
+        if (original.Success && original.Data is not null &&
+            !string.Equals(original.Data.FileName, FileName, StringComparison.Ordinal))
+            await _fileCache.DeleteAsync(Id, original.Data.FileName);
         await _fileCache.SyncAsync(Id, cancellationToken);
         Notice = "File renamed successfully.";
         return RedirectToPage();
