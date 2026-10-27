@@ -40,13 +40,12 @@
         <div class="table-responsive">
             <table class="table table-striped table-hover align-middle">
                 <thead>
-                    <tr><th>Code</th><th>Username</th><th>Email</th><th>Status</th><th>Role</th><th>Actions</th></tr>
+                    <tr><th>Username</th><th>Email</th><th>Status</th><th>Role</th><th>Actions</th></tr>
                 </thead>
                 <tbody>
                     @foreach (var user in Model.Users)
                     {
                         <tr>
-                            <td>@user.Code</td>
                             <td>@user.Username</td>
                             <td>@user.Email</td>
                             <td>@(user.Status == 1 ? "Active" : "Inactive")</td>
@@ -69,7 +68,6 @@
     else if (Model.Action == "Details" && Model.SelectedUser is not null)
     {
         <dl class="row">
-            <dt class="col-sm-3">Code</dt><dd class="col-sm-9">@Model.SelectedUser.Code</dd>
             <dt class="col-sm-3">Username</dt><dd class="col-sm-9">@Model.SelectedUser.Username</dd>
             <dt class="col-sm-3">Email</dt><dd class="col-sm-9">@Model.SelectedUser.Email</dd>
             <dt class="col-sm-3">Phone</dt><dd class="col-sm-9">@Model.SelectedUser.PhoneNumber</dd>
@@ -91,10 +89,6 @@
     {
         <form method="post" asp-page-handler="@(Model.Action == "Create" ? "Create" : "Edit")">
             <input type="hidden" asp-for="Input.Id" />
-            <div class="mb-3">
-                <label asp-for="Input.Code" class="form-label">Code</label>
-                <input asp-for="Input.Code" class="form-control" required />
-            </div>
             <div class="mb-3">
                 <label asp-for="Input.Username" class="form-label">Username</label>
                 <input asp-for="Input.Username" class="form-control" required />
