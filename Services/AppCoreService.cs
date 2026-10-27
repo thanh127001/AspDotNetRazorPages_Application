@@ -38,41 +38,41 @@ public sealed class AppCoreService : IAppCoreService
         DateModified = entity.DateModified
     };
 
-    public async Task<AppResultModel<List<AppSettingModel>>> GetSettingsAsync()
+    public async Task<AppResultModel<List<AppSettingModel>>> GetSettingsAsync(CancellationToken cancellationToken = default)
     {
         try
         {
-            var entities = await _db.AppSettings.AsNoTracking().OrderBy(x => x.Order).ThenBy(x => x.Name).ToListAsync();
+            var entities = await _db.AppSettings.AsNoTracking().OrderBy(x => x.Order).ThenBy(x => x.Name).ToListAsync(cancellationToken);
             return AppResultModel<List<AppSettingModel>>.Ok(entities.Select(ToModel).ToList());
         }
-        catch (Exception ex)
+        catch (Exception ex) when (ex is not OperationCanceledException || !cancellationToken.IsCancellationRequested)
         {
             _logger.LogError(ex, "GetSettingsAsync failed");
             return AppResultModel<List<AppSettingModel>>.Fail("An error occurred while processing the request.", ex.Message);
         }
     }
 
-    public async Task<AppResultModel<AppSettingModel>> GetSettingAsync(string id)
+    public async Task<AppResultModel<AppSettingModel>> GetSettingAsync(string id, CancellationToken cancellationToken = default)
     {
         try
         {
             if (string.IsNullOrWhiteSpace(id)) {
                 return AppResultModel<AppSettingModel>.Fail("Setting ID is required.");
             }
-            var entity = await _db.AppSettings.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
+            var entity = await _db.AppSettings.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
             if (entity is null) {
                 return AppResultModel<AppSettingModel>.Fail("Setting not found.");
             }
             return AppResultModel<AppSettingModel>.Ok(ToModel(entity));
         }
-        catch (Exception ex)
+        catch (Exception ex) when (ex is not OperationCanceledException || !cancellationToken.IsCancellationRequested)
         {
             _logger.LogError(ex, "GetSettingAsync failed");
             return AppResultModel<AppSettingModel>.Fail("An error occurred while processing the request.", ex.Message);
         }
     }
 
-    public async Task<AppResultModel<string>> CreateSettingAsync(AppSettingModel input)
+    public async Task<AppResultModel<string>> CreateSettingAsync(AppSettingModel input, CancellationToken cancellationToken = default)
     {
         try
         {
@@ -87,7 +87,7 @@ public sealed class AppCoreService : IAppCoreService
             {
                 errors.Add("Setting code is required.");
             }
-            else if (await _db.AppSettings.AnyAsync(x => x.Code == input.Code))
+            else if (await _db.AppSettings.AnyAsync(x => x.Code == input.Code, cancellationToken))
             {
                 errors.Add("Setting code already exists.");
             }
@@ -95,7 +95,7 @@ public sealed class AppCoreService : IAppCoreService
             {
                 errors.Add("Setting name is required.");
             }
-            else if (await _db.AppSettings.AnyAsync(x => x.Name == input.Name))
+            else if (await _db.AppSettings.AnyAsync(x => x.Name == input.Name, cancellationToken))
             {
                 errors.Add("Setting name already exists.");
             }
@@ -109,17 +109,17 @@ public sealed class AppCoreService : IAppCoreService
             }
             var entity = new AppSetting { Id = AppIdGenerator.GenerateId(), Code = input.Code, Name = input.Name, Value = input.Value, Order = input.Order };
             _db.AppSettings.Add(entity);
-            await _db.SaveChangesAsync();
+            await _db.SaveChangesAsync(cancellationToken);
             return AppResultModel<string>.Ok(entity.Id, "Setting created successfully.");
         }
-        catch (Exception ex)
+        catch (Exception ex) when (ex is not OperationCanceledException || !cancellationToken.IsCancellationRequested)
         {
             _logger.LogError(ex, "CreateSettingAsync failed");
             return AppResultModel<string>.Fail("An error occurred while processing the request.", ex.Message);
         }
     }
 
-    public async Task<AppResultModel<bool>> UpdateSettingAsync(AppSettingModel input)
+    public async Task<AppResultModel<bool>> UpdateSettingAsync(AppSettingModel input, CancellationToken cancellationToken = default)
     {
         try
         {
@@ -138,7 +138,7 @@ public sealed class AppCoreService : IAppCoreService
             {
                 errors.Add("Setting code is required.");
             }
-            else if (await _db.AppSettings.AnyAsync(x => x.Code == input.Code && x.Id != input.Id))
+            else if (await _db.AppSettings.AnyAsync(x => x.Code == input.Code && x.Id != input.Id, cancellationToken))
             {
                 errors.Add("Setting code already exists.");
             }
@@ -146,7 +146,7 @@ public sealed class AppCoreService : IAppCoreService
             {
                 errors.Add("Setting name is required.");
             }
-            else if (await _db.AppSettings.AnyAsync(x => x.Name == input.Name && x.Id != input.Id))
+            else if (await _db.AppSettings.AnyAsync(x => x.Name == input.Name && x.Id != input.Id, cancellationToken))
             {
                 errors.Add("Setting name already exists.");
             }
@@ -158,7 +158,7 @@ public sealed class AppCoreService : IAppCoreService
             {
                 return AppResultModel<bool>.Fail(errors.ToArray());
             }
-            var entity = await _db.AppSettings.FindAsync(input.Id);
+            var entity = await _db.AppSettings.FindAsync(new object[] { input.Id }, cancellationToken);
             if (entity is null)
             {
                 return AppResultModel<bool>.Fail("Setting not found.");
@@ -167,73 +167,73 @@ public sealed class AppCoreService : IAppCoreService
             entity.Name = input.Name;
             entity.Value = input.Value;
             entity.Order = input.Order;
-            await _db.SaveChangesAsync();
+            await _db.SaveChangesAsync(cancellationToken);
             return AppResultModel<bool>.Ok(true, "Setting updated successfully.");
         }
-        catch (Exception ex)
+        catch (Exception ex) when (ex is not OperationCanceledException || !cancellationToken.IsCancellationRequested)
         {
             _logger.LogError(ex, "UpdateSettingAsync failed");
             return AppResultModel<bool>.Fail("An error occurred while processing the request.", ex.Message);
         }
     }
 
-    public async Task<AppResultModel<bool>> DeleteSettingAsync(string id)
+    public async Task<AppResultModel<bool>> DeleteSettingAsync(string id, CancellationToken cancellationToken = default)
     {
         try
         {
             if (string.IsNullOrWhiteSpace(id)) {
                 return AppResultModel<bool>.Fail("Setting ID is required.");
             }
-            var entity = await _db.AppSettings.FindAsync(id);
+            var entity = await _db.AppSettings.FindAsync(new object[] { id }, cancellationToken);
             if (entity is null) {
                 return AppResultModel<bool>.Fail("Setting not found.");
             }
             _db.AppSettings.Remove(entity);
-            await _db.SaveChangesAsync();
+            await _db.SaveChangesAsync(cancellationToken);
             return AppResultModel<bool>.Ok(true, "Setting deleted successfully.");
         }
-        catch (Exception ex)
+        catch (Exception ex) when (ex is not OperationCanceledException || !cancellationToken.IsCancellationRequested)
         {
             _logger.LogError(ex, "DeleteSettingAsync failed");
             return AppResultModel<bool>.Fail("An error occurred while processing the request.", ex.Message);
         }
     }
 
-    public async Task<AppResultModel<List<AppUserModel>>> GetUsersAsync()
+    public async Task<AppResultModel<List<AppUserModel>>> GetUsersAsync(CancellationToken cancellationToken = default)
     {
         try
         {
-            var entities = await _db.AppUsers.AsNoTracking().OrderBy(x => x.Username).ToListAsync();
+            var entities = await _db.AppUsers.AsNoTracking().OrderBy(x => x.Username).ToListAsync(cancellationToken);
             return AppResultModel<List<AppUserModel>>.Ok(entities.Select(ToModel).ToList());
         }
-        catch (Exception ex)
+        catch (Exception ex) when (ex is not OperationCanceledException || !cancellationToken.IsCancellationRequested)
         {
             _logger.LogError(ex, "GetUsersAsync failed");
             return AppResultModel<List<AppUserModel>>.Fail("An error occurred while processing the request.", ex.Message);
         }
     }
 
-    public async Task<AppResultModel<AppUserModel>> GetUserAsync(string id)
+    public async Task<AppResultModel<AppUserModel>> GetUserAsync(string id, CancellationToken cancellationToken = default)
     {
         try
         {
             if (string.IsNullOrWhiteSpace(id)) {
                 return AppResultModel<AppUserModel>.Fail("User ID is required.");
             }
-            var entity = await _db.AppUsers.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
+            var entity = await _db.AppUsers.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
             if (entity is null) {
                 return AppResultModel<AppUserModel>.Fail("User not found.");
             }
             return AppResultModel<AppUserModel>.Ok(ToModel(entity));
         }
-        catch (Exception ex)
+        catch (Exception ex) when (ex is not OperationCanceledException || !cancellationToken.IsCancellationRequested)
         {
             _logger.LogError(ex, "GetUserAsync failed");
             return AppResultModel<AppUserModel>.Fail("An error occurred while processing the request.", ex.Message);
         }
     }
 
-    public async Task<AppResultModel<string>> CreateUserAsync(AppUserModel input)
+    public async Task<AppResultModel<string>> CreateUserAsync(AppUserModel input, CancellationToken cancellationToken = default)
     {
         try
         {
@@ -250,7 +250,7 @@ public sealed class AppCoreService : IAppCoreService
             {
                 errors.Add("User code is required.");
             }
-            else if (await _db.AppUsers.AnyAsync(x => x.Code == input.Code))
+            else if (await _db.AppUsers.AnyAsync(x => x.Code == input.Code, cancellationToken))
             {
                 errors.Add("User code already exists.");
             }
@@ -258,7 +258,7 @@ public sealed class AppCoreService : IAppCoreService
             {
                 errors.Add("Username is required.");
             }
-            else if (await _db.AppUsers.AnyAsync(x => x.Username == input.Username))
+            else if (await _db.AppUsers.AnyAsync(x => x.Username == input.Username, cancellationToken))
             {
                 errors.Add("Username already exists.");
             }
@@ -284,17 +284,17 @@ public sealed class AppCoreService : IAppCoreService
             }
             var entity = new AppUser { Id = AppIdGenerator.GenerateId(), Code = input.Code, Username = input.Username, Password = input.Password, Email = input.Email, PhoneNumber = input.PhoneNumber, Status = input.Status, Role = input.Role, DateCreated = DateTime.UtcNow, DateModified = DateTime.UtcNow };
             _db.AppUsers.Add(entity);
-            await _db.SaveChangesAsync();
+            await _db.SaveChangesAsync(cancellationToken);
             return AppResultModel<string>.Ok(entity.Id, "User created successfully.");
         }
-        catch (Exception ex)
+        catch (Exception ex) when (ex is not OperationCanceledException || !cancellationToken.IsCancellationRequested)
         {
             _logger.LogError(ex, "CreateUserAsync failed");
             return AppResultModel<string>.Fail("An error occurred while processing the request.", ex.Message);
         }
     }
 
-    public async Task<AppResultModel<bool>> UpdateUserAsync(AppUserModel input)
+    public async Task<AppResultModel<bool>> UpdateUserAsync(AppUserModel input, CancellationToken cancellationToken = default)
     {
         try
         {
@@ -315,7 +315,7 @@ public sealed class AppCoreService : IAppCoreService
             {
                 errors.Add("User code is required.");
             }
-            else if (await _db.AppUsers.AnyAsync(x => x.Code == input.Code && x.Id != input.Id))
+            else if (await _db.AppUsers.AnyAsync(x => x.Code == input.Code && x.Id != input.Id, cancellationToken))
             {
                 errors.Add("User code already exists.");
             }
@@ -323,7 +323,7 @@ public sealed class AppCoreService : IAppCoreService
             {
                 errors.Add("Username is required.");
             }
-            else if (await _db.AppUsers.AnyAsync(x => x.Username == input.Username && x.Id != input.Id))
+            else if (await _db.AppUsers.AnyAsync(x => x.Username == input.Username && x.Id != input.Id, cancellationToken))
             {
                 errors.Add("Username already exists.");
             }
@@ -343,7 +343,7 @@ public sealed class AppCoreService : IAppCoreService
             {
                 return AppResultModel<bool>.Fail(errors.ToArray());
             }
-            var entity = await _db.AppUsers.FindAsync(input.Id);
+            var entity = await _db.AppUsers.FindAsync(new object[] { input.Id }, cancellationToken);
             if (entity is null)
             {
                 return AppResultModel<bool>.Fail("User not found.");
@@ -359,32 +359,32 @@ public sealed class AppCoreService : IAppCoreService
                 entity.Password = input.Password;
             }
             entity.DateModified = DateTime.UtcNow;
-            await _db.SaveChangesAsync();
+            await _db.SaveChangesAsync(cancellationToken);
             return AppResultModel<bool>.Ok(true, "User updated successfully.");
         }
-        catch (Exception ex)
+        catch (Exception ex) when (ex is not OperationCanceledException || !cancellationToken.IsCancellationRequested)
         {
             _logger.LogError(ex, "UpdateUserAsync failed");
             return AppResultModel<bool>.Fail("An error occurred while processing the request.", ex.Message);
         }
     }
 
-    public async Task<AppResultModel<bool>> DeleteUserAsync(string id)
+    public async Task<AppResultModel<bool>> DeleteUserAsync(string id, CancellationToken cancellationToken = default)
     {
         try
         {
             if (string.IsNullOrWhiteSpace(id)) {
                 return AppResultModel<bool>.Fail("User ID is required.");
             }
-            var entity = await _db.AppUsers.FindAsync(id);
+            var entity = await _db.AppUsers.FindAsync(new object[] { id }, cancellationToken);
             if (entity is null) {
                 return AppResultModel<bool>.Fail("User not found.");
             }
             _db.AppUsers.Remove(entity);
-            await _db.SaveChangesAsync();
+            await _db.SaveChangesAsync(cancellationToken);
             return AppResultModel<bool>.Ok(true, "User deleted successfully.");
         }
-        catch (Exception ex)
+        catch (Exception ex) when (ex is not OperationCanceledException || !cancellationToken.IsCancellationRequested)
         {
             _logger.LogError(ex, "DeleteUserAsync failed");
             return AppResultModel<bool>.Fail("An error occurred while processing the request.", ex.Message);
