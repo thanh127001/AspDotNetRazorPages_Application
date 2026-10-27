@@ -370,6 +370,25 @@ public sealed class AppCoreService : IAppCoreService
             {
                 return AppResultModel<bool>.Fail("User not found.");
             }
+            if (string.Equals(entity.Username, "administrator", StringComparison.OrdinalIgnoreCase))
+            {
+                if (!string.Equals(input.Username, "administrator", StringComparison.Ordinal))
+                {
+                    errors.Add("The administrator username cannot be changed.");
+                }
+                if (input.Role != 1)
+                {
+                    errors.Add("The administrator role must remain Administrator (1).");
+                }
+                if (input.Status != 1)
+                {
+                    errors.Add("The administrator status must remain Active (1).");
+                }
+                if (errors.Count > 0)
+                {
+                    return AppResultModel<bool>.Fail(errors.ToArray());
+                }
+            }
             entity.Code = input.Code;
             entity.Username = input.Username;
             entity.Email = input.Email;
