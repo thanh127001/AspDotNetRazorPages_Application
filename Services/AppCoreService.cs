@@ -16,6 +16,45 @@ public sealed class AppCoreService : IAppCoreService
         _logger = logger;
     }
 
+    private const int MaxFileSize = 1024 * 1024;
+
+    private static bool TryGetFileType(string? fileName, byte[]? content, out string fileType)
+    {
+        fileType = string.Empty;
+        if (string.IsNullOrWhiteSpace(fileName) || content is null ||
+            content.Length == 0 || content.Length > MaxFileSize)
+            return false;
+
+        var extension = Path.GetExtension(fileName).ToLowerInvariant();
+        ReadOnlySpan<byte> data = content;
+        switch (extension)
+        {
+            case ".png" when data.Length >= 8 &&
+                data[..8].SequenceEqual(new byte[] { 137, 80, 78, 71, 13, 10, 26, 10 }):
+                fileType = "image/png";
+                return true;
+            case ".jpg" or ".jpeg" when data.Length >= 4 &&
+                data[0] == 0xFF && data[1] == 0xD8 &&
+                data[^2] == 0xFF && data[^1] == 0xD9:
+                fileType = "image/jpeg";
+                return true;
+            case ".pdf" when data.Length >= 5 &&
+                data[..5].SequenceEqual("%PDF-"u8):
+                fileType = "application/pdf";
+                return true;
+            case ".txt":
+                try
+                {
+                    var value = new System.Text.UTF8Encoding(false, true).GetString(content);
+                    if (value.Contains('\0')) return false;
+                    fileType = "text/plain";
+                    return true;
+                }
+                catch (System.Text.DecoderFallbackException) { return false; }
+        }
+        return false;
+    }
+
     public async Task<AppResultModel<List<AppFileModel>>> GetFilesAsync(CancellationToken cancellationToken = default)
     {
         try
@@ -55,7 +94,7 @@ public sealed class AppCoreService : IAppCoreService
 
     public async Task<AppResultModel<string>> CreateFileAsync(AppFileModel input, CancellationToken cancellationToken = default)
     {
-        if (input is null || !AppFileValidation.TryGetFileType(input.FileName, input.FileContent, out var type))
+        if (input is null || !TryGetFileType(input.FileName, input.FileContent, out var type))
             return AppResultModel<string>.Fail("Only valid PNG, JPG, TXT and PDF files up to 1 MB are allowed.");
         try
         {
