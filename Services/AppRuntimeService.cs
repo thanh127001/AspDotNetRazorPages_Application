@@ -1,6 +1,6 @@
 namespace Application.Services;
 
-public sealed class AppRuntimeService
+public sealed class AppRuntimeService : IAppRuntimeService
 {
     private readonly object _sync = new();
     private string? _accessCode;
