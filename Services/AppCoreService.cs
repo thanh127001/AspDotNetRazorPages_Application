@@ -49,12 +49,12 @@ public sealed class AppCoreService : IAppCoreService
         catch (DbUpdateException ex)
         {
             _logger.LogError(ex, "GetSettingsAsync database error");
-            return AppResultModel<List<AppSettingModel>>.Fail(AppResultCode.DatabaseError, "Unable to save or retrieve data. Please try again.");
+            return AppResultModel<List<AppSettingModel>>.Fail("Unable to save or retrieve data. Please try again.");
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "GetSettingsAsync unexpected error");
-            return AppResultModel<List<AppSettingModel>>.Fail(AppResultCode.UnexpectedError, "An unexpected error occurred.");
+            return AppResultModel<List<AppSettingModel>>.Fail("An unexpected error occurred.");
         }
     }
 
@@ -63,23 +63,23 @@ public sealed class AppCoreService : IAppCoreService
         try
         {
             if (string.IsNullOrWhiteSpace(id)) {
-                return AppResultModel<AppSettingModel>.Fail(AppResultCode.ValidationError, "Setting ID is required.");
+                return AppResultModel<AppSettingModel>.Fail("Setting ID is required.");
             }
             var row = await _db.AppSettings.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
             if (row is null) {
-                return AppResultModel<AppSettingModel>.Fail(AppResultCode.NotFound, "Setting not found.");
+                return AppResultModel<AppSettingModel>.Fail("Setting not found.");
             }
             return AppResultModel<AppSettingModel>.Ok(ToModel(row));
         }
         catch (DbUpdateException ex)
         {
             _logger.LogError(ex, "GetSettingAsync database error");
-            return AppResultModel<AppSettingModel>.Fail(AppResultCode.DatabaseError, "Unable to save or retrieve data. Please try again.");
+            return AppResultModel<AppSettingModel>.Fail("Unable to save or retrieve data. Please try again.");
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "GetSettingAsync unexpected error");
-            return AppResultModel<AppSettingModel>.Fail(AppResultCode.UnexpectedError, "An unexpected error occurred.");
+            return AppResultModel<AppSettingModel>.Fail("An unexpected error occurred.");
         }
     }
 
@@ -88,7 +88,7 @@ public sealed class AppCoreService : IAppCoreService
         try
         {
             if (model is null) {
-                return AppResultModel<AppSettingModel>.Fail(AppResultCode.ValidationError, "Setting data is required.");
+                return AppResultModel<AppSettingModel>.Fail("Setting data is required.");
             }
             var errors = new List<string>();
             if (string.IsNullOrWhiteSpace(model.Name)) {
@@ -98,10 +98,10 @@ public sealed class AppCoreService : IAppCoreService
                 errors.Add("Setting value is required.");
             }
             if (errors.Count > 0) {
-                return AppResultModel<AppSettingModel>.Fail(AppResultCode.ValidationError, errors.ToArray());
+                return AppResultModel<AppSettingModel>.Fail(errors.ToArray());
             }
             if (model.Code is not null && await _db.AppSettings.AnyAsync(x => x.Code == model.Code)) {
-                return AppResultModel<AppSettingModel>.Fail(AppResultCode.Duplicate, "Setting code already exists.");
+                return AppResultModel<AppSettingModel>.Fail("Setting code already exists.");
             }
             var row = new AppSetting { Id = AppIdGenerator.GenerateId(), Code = model.Code, Name = model.Name, Value = model.Value, Order = model.Order };
             _db.AppSettings.Add(row);
@@ -111,12 +111,12 @@ public sealed class AppCoreService : IAppCoreService
         catch (DbUpdateException ex)
         {
             _logger.LogError(ex, "CreateSettingAsync database error");
-            return AppResultModel<AppSettingModel>.Fail(AppResultCode.DatabaseError, "Unable to save or retrieve data. Please try again.");
+            return AppResultModel<AppSettingModel>.Fail("Unable to save or retrieve data. Please try again.");
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "CreateSettingAsync unexpected error");
-            return AppResultModel<AppSettingModel>.Fail(AppResultCode.UnexpectedError, "An unexpected error occurred.");
+            return AppResultModel<AppSettingModel>.Fail("An unexpected error occurred.");
         }
     }
 
@@ -125,7 +125,7 @@ public sealed class AppCoreService : IAppCoreService
         try
         {
             if (model is null || string.IsNullOrWhiteSpace(model.Id)) {
-                return AppResultModel<bool>.Fail(AppResultCode.ValidationError, "Setting ID is required.");
+                return AppResultModel<bool>.Fail("Setting ID is required.");
             }
             var errors = new List<string>();
             if (string.IsNullOrWhiteSpace(model.Name)) {
@@ -135,14 +135,14 @@ public sealed class AppCoreService : IAppCoreService
                 errors.Add("Setting value is required.");
             }
             if (errors.Count > 0) {
-                return AppResultModel<bool>.Fail(AppResultCode.ValidationError, errors.ToArray());
+                return AppResultModel<bool>.Fail(errors.ToArray());
             }
             var row = await _db.AppSettings.FindAsync(model.Id);
             if (row is null) {
-                return AppResultModel<bool>.Fail(AppResultCode.NotFound, "Setting not found.");
+                return AppResultModel<bool>.Fail("Setting not found.");
             }
             if (model.Code is not null && await _db.AppSettings.AnyAsync(x => x.Code == model.Code && x.Id != model.Id)) {
-                return AppResultModel<bool>.Fail(AppResultCode.Duplicate, "Setting code already exists.");
+                return AppResultModel<bool>.Fail("Setting code already exists.");
             }
             row.Code = model.Code; row.Name = model.Name; row.Value = model.Value; row.Order = model.Order;
             await _db.SaveChangesAsync();
@@ -151,12 +151,12 @@ public sealed class AppCoreService : IAppCoreService
         catch (DbUpdateException ex)
         {
             _logger.LogError(ex, "UpdateSettingAsync database error");
-            return AppResultModel<bool>.Fail(AppResultCode.DatabaseError, "Unable to save or retrieve data. Please try again.");
+            return AppResultModel<bool>.Fail("Unable to save or retrieve data. Please try again.");
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "UpdateSettingAsync unexpected error");
-            return AppResultModel<bool>.Fail(AppResultCode.UnexpectedError, "An unexpected error occurred.");
+            return AppResultModel<bool>.Fail("An unexpected error occurred.");
         }
     }
 
@@ -165,11 +165,11 @@ public sealed class AppCoreService : IAppCoreService
         try
         {
             if (string.IsNullOrWhiteSpace(id)) {
-                return AppResultModel<bool>.Fail(AppResultCode.ValidationError, "Setting ID is required.");
+                return AppResultModel<bool>.Fail("Setting ID is required.");
             }
             var row = await _db.AppSettings.FindAsync(id);
             if (row is null) {
-                return AppResultModel<bool>.Fail(AppResultCode.NotFound, "Setting not found.");
+                return AppResultModel<bool>.Fail("Setting not found.");
             }
             _db.AppSettings.Remove(row);
             await _db.SaveChangesAsync();
@@ -178,12 +178,12 @@ public sealed class AppCoreService : IAppCoreService
         catch (DbUpdateException ex)
         {
             _logger.LogError(ex, "DeleteSettingAsync database error");
-            return AppResultModel<bool>.Fail(AppResultCode.DatabaseError, "Unable to save or retrieve data. Please try again.");
+            return AppResultModel<bool>.Fail("Unable to save or retrieve data. Please try again.");
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "DeleteSettingAsync unexpected error");
-            return AppResultModel<bool>.Fail(AppResultCode.UnexpectedError, "An unexpected error occurred.");
+            return AppResultModel<bool>.Fail("An unexpected error occurred.");
         }
     }
 
@@ -197,12 +197,12 @@ public sealed class AppCoreService : IAppCoreService
         catch (DbUpdateException ex)
         {
             _logger.LogError(ex, "GetUsersAsync database error");
-            return AppResultModel<List<AppUserModel>>.Fail(AppResultCode.DatabaseError, "Unable to save or retrieve data. Please try again.");
+            return AppResultModel<List<AppUserModel>>.Fail("Unable to save or retrieve data. Please try again.");
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "GetUsersAsync unexpected error");
-            return AppResultModel<List<AppUserModel>>.Fail(AppResultCode.UnexpectedError, "An unexpected error occurred.");
+            return AppResultModel<List<AppUserModel>>.Fail("An unexpected error occurred.");
         }
     }
 
@@ -211,23 +211,23 @@ public sealed class AppCoreService : IAppCoreService
         try
         {
             if (string.IsNullOrWhiteSpace(id)) {
-                return AppResultModel<AppUserModel>.Fail(AppResultCode.ValidationError, "User ID is required.");
+                return AppResultModel<AppUserModel>.Fail("User ID is required.");
             }
             var row = await _db.AppUsers.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
             if (row is null) {
-                return AppResultModel<AppUserModel>.Fail(AppResultCode.NotFound, "User not found.");
+                return AppResultModel<AppUserModel>.Fail("User not found.");
             }
             return AppResultModel<AppUserModel>.Ok(ToModel(row));
         }
         catch (DbUpdateException ex)
         {
             _logger.LogError(ex, "GetUserAsync database error");
-            return AppResultModel<AppUserModel>.Fail(AppResultCode.DatabaseError, "Unable to save or retrieve data. Please try again.");
+            return AppResultModel<AppUserModel>.Fail("Unable to save or retrieve data. Please try again.");
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "GetUserAsync unexpected error");
-            return AppResultModel<AppUserModel>.Fail(AppResultCode.UnexpectedError, "An unexpected error occurred.");
+            return AppResultModel<AppUserModel>.Fail("An unexpected error occurred.");
         }
     }
 
@@ -236,7 +236,7 @@ public sealed class AppCoreService : IAppCoreService
         try
         {
             if (model is null) {
-                return AppResultModel<AppUserModel>.Fail(AppResultCode.ValidationError, "User data is required.");
+                return AppResultModel<AppUserModel>.Fail("User data is required.");
             }
             var errors = new List<string>();
             if (string.IsNullOrWhiteSpace(model.Username)) {
@@ -249,13 +249,13 @@ public sealed class AppCoreService : IAppCoreService
                 errors.Add("Email is invalid.");
             }
             if (errors.Count > 0) {
-                return AppResultModel<AppUserModel>.Fail(AppResultCode.ValidationError, errors.ToArray());
+                return AppResultModel<AppUserModel>.Fail(errors.ToArray());
             }
             if (model.Code is not null && await _db.AppUsers.AnyAsync(x => x.Code == model.Code)) {
-                return AppResultModel<AppUserModel>.Fail(AppResultCode.Duplicate, "User code already exists.");
+                return AppResultModel<AppUserModel>.Fail("User code already exists.");
             }
             if (await _db.AppUsers.AnyAsync(x => x.Username == model.Username)) {
-                return AppResultModel<AppUserModel>.Fail(AppResultCode.Duplicate, "Username already exists.");
+                return AppResultModel<AppUserModel>.Fail("Username already exists.");
             }
             var row = new AppUser { Id = AppIdGenerator.GenerateId(), Code = model.Code, Username = model.Username, Password = model.Password, Email = model.Email, PhoneNumber = model.PhoneNumber, Status = model.Status, Role = model.Role, DateCreated = DateTime.UtcNow, DateModified = DateTime.UtcNow };
             _db.AppUsers.Add(row);
@@ -265,12 +265,12 @@ public sealed class AppCoreService : IAppCoreService
         catch (DbUpdateException ex)
         {
             _logger.LogError(ex, "CreateUserAsync database error");
-            return AppResultModel<AppUserModel>.Fail(AppResultCode.DatabaseError, "Unable to save or retrieve data. Please try again.");
+            return AppResultModel<AppUserModel>.Fail("Unable to save or retrieve data. Please try again.");
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "CreateUserAsync unexpected error");
-            return AppResultModel<AppUserModel>.Fail(AppResultCode.UnexpectedError, "An unexpected error occurred.");
+            return AppResultModel<AppUserModel>.Fail("An unexpected error occurred.");
         }
     }
 
@@ -279,7 +279,7 @@ public sealed class AppCoreService : IAppCoreService
         try
         {
             if (model is null || string.IsNullOrWhiteSpace(model.Id)) {
-                return AppResultModel<bool>.Fail(AppResultCode.ValidationError, "User ID is required.");
+                return AppResultModel<bool>.Fail("User ID is required.");
             }
             var errors = new List<string>();
             if (string.IsNullOrWhiteSpace(model.Username)) {
@@ -289,17 +289,17 @@ public sealed class AppCoreService : IAppCoreService
                 errors.Add("Email is invalid.");
             }
             if (errors.Count > 0) {
-                return AppResultModel<bool>.Fail(AppResultCode.ValidationError, errors.ToArray());
+                return AppResultModel<bool>.Fail(errors.ToArray());
             }
             var row = await _db.AppUsers.FindAsync(model.Id);
             if (row is null) {
-                return AppResultModel<bool>.Fail(AppResultCode.NotFound, "User not found.");
+                return AppResultModel<bool>.Fail("User not found.");
             }
             if (model.Code is not null && await _db.AppUsers.AnyAsync(x => x.Code == model.Code && x.Id != model.Id)) {
-                return AppResultModel<bool>.Fail(AppResultCode.Duplicate, "User code already exists.");
+                return AppResultModel<bool>.Fail("User code already exists.");
             }
             if (await _db.AppUsers.AnyAsync(x => x.Username == model.Username && x.Id != model.Id)) {
-                return AppResultModel<bool>.Fail(AppResultCode.Duplicate, "Username already exists.");
+                return AppResultModel<bool>.Fail("Username already exists.");
             }
             row.Code = model.Code; row.Username = model.Username; row.Email = model.Email; row.PhoneNumber = model.PhoneNumber; row.Status = model.Status; row.Role = model.Role;
             if (!string.IsNullOrWhiteSpace(model.Password)) {
@@ -312,12 +312,12 @@ public sealed class AppCoreService : IAppCoreService
         catch (DbUpdateException ex)
         {
             _logger.LogError(ex, "UpdateUserAsync database error");
-            return AppResultModel<bool>.Fail(AppResultCode.DatabaseError, "Unable to save or retrieve data. Please try again.");
+            return AppResultModel<bool>.Fail("Unable to save or retrieve data. Please try again.");
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "UpdateUserAsync unexpected error");
-            return AppResultModel<bool>.Fail(AppResultCode.UnexpectedError, "An unexpected error occurred.");
+            return AppResultModel<bool>.Fail("An unexpected error occurred.");
         }
     }
 
@@ -326,11 +326,11 @@ public sealed class AppCoreService : IAppCoreService
         try
         {
             if (string.IsNullOrWhiteSpace(id)) {
-                return AppResultModel<bool>.Fail(AppResultCode.ValidationError, "User ID is required.");
+                return AppResultModel<bool>.Fail("User ID is required.");
             }
             var row = await _db.AppUsers.FindAsync(id);
             if (row is null) {
-                return AppResultModel<bool>.Fail(AppResultCode.NotFound, "User not found.");
+                return AppResultModel<bool>.Fail("User not found.");
             }
             _db.AppUsers.Remove(row);
             await _db.SaveChangesAsync();
@@ -339,12 +339,12 @@ public sealed class AppCoreService : IAppCoreService
         catch (DbUpdateException ex)
         {
             _logger.LogError(ex, "DeleteUserAsync database error");
-            return AppResultModel<bool>.Fail(AppResultCode.DatabaseError, "Unable to save or retrieve data. Please try again.");
+            return AppResultModel<bool>.Fail("Unable to save or retrieve data. Please try again.");
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "DeleteUserAsync unexpected error");
-            return AppResultModel<bool>.Fail(AppResultCode.UnexpectedError, "An unexpected error occurred.");
+            return AppResultModel<bool>.Fail("An unexpected error occurred.");
         }
     }
 }
