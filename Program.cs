@@ -19,7 +19,23 @@ builder.Host.UseSerilog((context, services, logger) => logger
         rollingInterval: RollingInterval.Day,
         retainedFileCountLimit: 30,
         shared: true));
-builder.Services.AddRazorPages();
+builder.Services.AddRazorPages(options =>
+{
+    options.Conventions.AuthorizeFolder("/");
+    options.Conventions.AllowAnonymousToPage("/Index");
+    options.Conventions.AllowAnonymousToPage("/Error");
+    options.Conventions.AllowAnonymousToPage("/Initiation");
+    options.Conventions.AllowAnonymousToPage("/About");
+    options.Conventions.AllowAnonymousToPage("/Privacy");
+    options.Conventions.AllowAnonymousToPage("/Account/Index");
+    options.Conventions.AuthorizePage("/User/Index", "AdministratorOnly");
+    options.Conventions.AuthorizePage("/Setting/Index", "AdministratorOnly");
+});
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("AdministratorOnly", policy =>
+        policy.RequireAuthenticatedUser().RequireRole("1"));
+});
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
