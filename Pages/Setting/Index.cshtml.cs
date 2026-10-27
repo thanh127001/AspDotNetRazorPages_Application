@@ -8,10 +8,12 @@ namespace Application.Pages.Setting;
 public class IndexModel : PageModel
 {
     private readonly IAppCoreService _core;
+    private readonly IAppRuntimeService _runtime;
 
-    public IndexModel(IAppCoreService core)
+    public IndexModel(IAppCoreService core, IAppRuntimeService runtime)
     {
         _core = core;
+        _runtime = runtime;
     }
 
     public List<AppSettingModel> Settings { get; private set; } = new();
@@ -74,6 +76,9 @@ public class IndexModel : PageModel
             Messages = result.Messages;
             return Page();
         }
+        var saved = await _core.GetSettingAsync(Input.Id, cancellationToken);
+        if (saved.Success && saved.Data is not null)
+            _runtime.SetSettingValue(saved.Data.Code, saved.Data.Value);
         Notice = string.Join(" ", result.Messages);
         return RedirectToPage();
     }
