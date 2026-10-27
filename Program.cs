@@ -30,6 +30,7 @@ builder.Services.AddRazorPages(options =>
     options.Conventions.AllowAnonymousToPage("/Account/Index");
     options.Conventions.AuthorizePage("/User/Index", "AdministratorOnly");
     options.Conventions.AuthorizePage("/Setting/Index", "AdministratorOnly");
+    options.Conventions.AuthorizePage("/File/Index", "AdministratorOnly");
 });
 builder.Services.AddAuthorization(options =>
 {
