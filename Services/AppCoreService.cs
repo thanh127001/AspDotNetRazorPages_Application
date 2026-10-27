@@ -53,6 +53,32 @@ public sealed class AppCoreService : IAppCoreService
         }
     }
 
+    public async Task<AppResultModel<string>> CreateFileAsync(AppFileModel input, CancellationToken cancellationToken = default)
+    {
+        if (input is null || !AppFileValidation.TryGetFileType(input.FileName, input.FileContent, out var type))
+            return AppResultModel<string>.Fail("Only valid PNG, JPG, TXT and PDF files up to 1 MB are allowed.");
+        try
+        {
+            var file = new AppFile
+            {
+                Id = AppIdGenerator.GenerateId(),
+                FileName = Path.GetFileName(input.FileName),
+                FileType = type,
+                FileSize = input.FileContent.Length,
+                FileContent = input.FileContent,
+                Order = input.Order
+            };
+            _db.AppFiles.Add(file);
+            await _db.SaveChangesAsync(cancellationToken);
+            return AppResultModel<string>.Ok(file.Id, "File created successfully.");
+        }
+        catch (Exception ex)
+        {
+            var errorId = AppErrorLog.Log(_logger, ex, nameof(CreateFileAsync));
+            return AppResultModel<string>.Fail($"Error ID: {errorId}");
+        }
+    }
+
     private static AppSettingModel ToModel(AppSetting entity) => new()
     {
         Id = entity.Id,
