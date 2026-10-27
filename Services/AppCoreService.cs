@@ -73,12 +73,12 @@ public sealed class AppCoreService : IAppCoreService
         }
     }
 
-    public async Task<AppResultModel<AppSettingModel>> CreateSettingAsync(AppSettingModel model)
+    public async Task<AppResultModel<string>> CreateSettingAsync(AppSettingModel model)
     {
         try
         {
             if (model is null) {
-                return AppResultModel<AppSettingModel>.Fail("Setting data is required.");
+                return AppResultModel<string>.Fail("Setting data is required.");
             }
             var errors = new List<string>();
             if (string.IsNullOrWhiteSpace(model.Name)) {
@@ -88,20 +88,20 @@ public sealed class AppCoreService : IAppCoreService
                 errors.Add("Setting value is required.");
             }
             if (errors.Count > 0) {
-                return AppResultModel<AppSettingModel>.Fail(errors.ToArray());
+                return AppResultModel<string>.Fail(errors.ToArray());
             }
             if (model.Code is not null && await _db.AppSettings.AnyAsync(x => x.Code == model.Code)) {
-                return AppResultModel<AppSettingModel>.Fail("Setting code already exists.");
+                return AppResultModel<string>.Fail("Setting code already exists.");
             }
             var row = new AppSetting { Id = AppIdGenerator.GenerateId(), Code = model.Code, Name = model.Name, Value = model.Value, Order = model.Order };
             _db.AppSettings.Add(row);
             await _db.SaveChangesAsync();
-            return AppResultModel<AppSettingModel>.Ok(ToModel(row), "Setting created successfully.");
+            return AppResultModel<string>.Ok(row.Id, "Setting created successfully.");
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "CreateSettingAsync failed");
-            return AppResultModel<AppSettingModel>.Fail("An error occurred while processing the request.", ex.Message);
+            return AppResultModel<string>.Fail("An error occurred while processing the request.", ex.Message);
         }
     }
 
@@ -196,12 +196,12 @@ public sealed class AppCoreService : IAppCoreService
         }
     }
 
-    public async Task<AppResultModel<AppUserModel>> CreateUserAsync(AppUserModel model)
+    public async Task<AppResultModel<string>> CreateUserAsync(AppUserModel model)
     {
         try
         {
             if (model is null) {
-                return AppResultModel<AppUserModel>.Fail("User data is required.");
+                return AppResultModel<string>.Fail("User data is required.");
             }
             var errors = new List<string>();
             if (string.IsNullOrWhiteSpace(model.Username)) {
@@ -214,23 +214,23 @@ public sealed class AppCoreService : IAppCoreService
                 errors.Add("Email is invalid.");
             }
             if (errors.Count > 0) {
-                return AppResultModel<AppUserModel>.Fail(errors.ToArray());
+                return AppResultModel<string>.Fail(errors.ToArray());
             }
             if (model.Code is not null && await _db.AppUsers.AnyAsync(x => x.Code == model.Code)) {
-                return AppResultModel<AppUserModel>.Fail("User code already exists.");
+                return AppResultModel<string>.Fail("User code already exists.");
             }
             if (await _db.AppUsers.AnyAsync(x => x.Username == model.Username)) {
-                return AppResultModel<AppUserModel>.Fail("Username already exists.");
+                return AppResultModel<string>.Fail("Username already exists.");
             }
             var row = new AppUser { Id = AppIdGenerator.GenerateId(), Code = model.Code, Username = model.Username, Password = model.Password, Email = model.Email, PhoneNumber = model.PhoneNumber, Status = model.Status, Role = model.Role, DateCreated = DateTime.UtcNow, DateModified = DateTime.UtcNow };
             _db.AppUsers.Add(row);
             await _db.SaveChangesAsync();
-            return AppResultModel<AppUserModel>.Ok(ToModel(row), "User created successfully.");
+            return AppResultModel<string>.Ok(row.Id, "User created successfully.");
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "CreateUserAsync failed");
-            return AppResultModel<AppUserModel>.Fail("An error occurred while processing the request.", ex.Message);
+            return AppResultModel<string>.Fail("An error occurred while processing the request.", ex.Message);
         }
     }
 
