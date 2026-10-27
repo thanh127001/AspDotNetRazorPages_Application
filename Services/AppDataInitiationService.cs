@@ -71,26 +71,34 @@ public sealed class AppDataInitiationService : IAppDataInitiationService
             throw new InvalidOperationException(string.Join(" ", result.Messages));
         }
 
-        if (result.Data is { Count: > 0 })
-        {
-            return;
-        }
-
         var settings = new[]
         {
             new AppSettingModel { Code = "app-name", Name = "App Name", Value = "Application", Order = 1 },
-            new AppSettingModel { Code = "app-description", Name = "App Description", Value = "", Order = 2 },
+            new AppSettingModel { Code = "app-description", Name = "App Description", Value = "Application web tools and services.", Order = 2 },
             new AppSettingModel { Code = "app-icon", Name = "App Icon", Value = "", Order = 3 },
             new AppSettingModel { Code = "app-favicon", Name = "App Favicon", Value = "", Order = 4 },
-            new AppSettingModel { Code = "app-copyright", Name = "App Copyright", Value = "", Order = 5 }
+            new AppSettingModel { Code = "app-copyright", Name = "App Copyright", Value = "© Application. All rights reserved.", Order = 5 }
         };
 
+        var existing = result.Data ?? new List<AppSettingModel>();
         foreach (var setting in settings)
         {
-            var created = await _core.CreateSettingAsync(setting, cancellationToken);
-            if (!created.Success)
+            var current = existing.FirstOrDefault(x =>
+                string.Equals(x.Code, setting.Code, StringComparison.OrdinalIgnoreCase));
+
+            if (current is null)
             {
-                throw new InvalidOperationException(string.Join(" ", created.Messages));
+                var created = await _core.CreateSettingAsync(setting, cancellationToken);
+                if (!created.Success)
+                    throw new InvalidOperationException(string.Join(" ", created.Messages));
+            }
+            else if ((setting.Code is "app-description" or "app-copyright")
+                     && string.IsNullOrWhiteSpace(current.Value))
+            {
+                current.Value = setting.Value;
+                var updated = await _core.UpdateSettingAsync(current, cancellationToken);
+                if (!updated.Success)
+                    throw new InvalidOperationException(string.Join(" ", updated.Messages));
             }
         }
     }
