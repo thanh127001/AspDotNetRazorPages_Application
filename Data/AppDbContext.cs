@@ -18,6 +18,7 @@ namespace Application.Data
                 entity.ToTable("AppSettings");
                 entity.HasKey(e => e.Id);
                 entity.HasIndex(x => x.Code).IsUnique();
+                entity.HasIndex(x => x.Name).IsUnique();
             });
 
             modelBuilder.Entity<AppUser>(entity =>
