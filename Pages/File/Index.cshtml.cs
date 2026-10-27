@@ -8,7 +8,12 @@ namespace Application.Pages.File;
 public class IndexModel : PageModel
 {
     private readonly IAppCoreService _core;
-    public IndexModel(IAppCoreService core) => _core = core;
+    private readonly AppFileCacheService _fileCache;
+    public IndexModel(IAppCoreService core, AppFileCacheService fileCache)
+    {
+        _core = core;
+        _fileCache = fileCache;
+    }
 
     public List<AppFileModel> Files { get; private set; } = new();
     public List<string> Messages { get; private set; } = new();
@@ -53,6 +58,7 @@ public class IndexModel : PageModel
             return Page();
         }
 
+        await _fileCache.SyncAsync(result.Data!, cancellationToken);
         Notice = "File uploaded successfully.";
         return RedirectToPage();
     }
@@ -66,12 +72,14 @@ public class IndexModel : PageModel
             await LoadAsync(cancellationToken);
             return Page();
         }
+        await _fileCache.SyncAsync(Id, cancellationToken);
         Notice = "File renamed successfully.";
         return RedirectToPage();
     }
 
     public async Task<IActionResult> OnPostDeleteAsync(CancellationToken cancellationToken)
     {
+        var original = await _core.GetFileAsync(Id, cancellationToken);
         var result = await _core.DeleteFileAsync(Id, cancellationToken);
         if (!result.Success)
         {
@@ -79,6 +87,8 @@ public class IndexModel : PageModel
             await LoadAsync(cancellationToken);
             return Page();
         }
+        if (original.Success && original.Data is not null)
+            await _fileCache.DeleteAsync(Id, original.Data.FileName);
         Notice = "File deleted successfully.";
         return RedirectToPage();
     }
