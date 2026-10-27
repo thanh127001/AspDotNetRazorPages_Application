@@ -47,6 +47,17 @@ public sealed class AppDatabaseService : IAppDatabaseService
                 if (string.IsNullOrWhiteSpace(version?.ToString()))
                     throw new InvalidOperationException("SQLCipher is not available.");
                 await db.Database.MigrateAsync(cancellationToken);
+                // Ensure the new BLOB table exists for databases created before AppFiles.
+                await db.Database.ExecuteSqlRawAsync("""
+                    CREATE TABLE IF NOT EXISTS "AppFiles" (
+                        "Id" TEXT NOT NULL PRIMARY KEY,
+                        "FileName" TEXT NOT NULL,
+                        "FileType" TEXT NOT NULL,
+                        "FileSize" INTEGER NOT NULL,
+                        "FileContent" BLOB NOT NULL,
+                        "Order" INTEGER NOT NULL
+                    );
+                    """, cancellationToken);
             }
             finally { await db.Database.CloseConnectionAsync(); }
             _runtime.SetAccessCode(code);
