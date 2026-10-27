@@ -1,4 +1,3 @@
-using Application.Common;
 using Application.Models;
 using Application.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -31,7 +30,7 @@ public class IndexModel : PageModel
 
     public async Task<IActionResult> OnPostCreateAsync(CancellationToken cancellationToken)
     {
-        if (Upload is null || Upload.Length == 0 || Upload.Length > AppFileValidation.MaxFileSize)
+        if (Upload is null || Upload.Length == 0 || Upload.Length > 1024 * 1024)
         {
             Messages.Add("Choose a PNG, JPG, TXT or PDF file up to 1 MB.");
             await LoadAsync(cancellationToken);
