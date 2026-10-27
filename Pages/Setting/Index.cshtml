@@ -49,7 +49,6 @@
                             <td class="text-nowrap">
                                 <a asp-page="./Index" asp-route-mode="Details" asp-route-id="@setting.Id" class="btn btn-sm btn-outline-secondary">Details</a>
                                 <a asp-page="./Index" asp-route-mode="Edit" asp-route-id="@setting.Id" class="btn btn-sm btn-outline-primary">Edit</a>
-                                <a asp-page="./Index" asp-route-mode="Delete" asp-route-id="@setting.Id" class="btn btn-sm btn-outline-danger">Delete</a>
                             </td>
                         </tr>
                     }
@@ -70,22 +69,24 @@
             <dt class="col-sm-3">Order</dt><dd class="col-sm-9">@Model.SelectedSetting.Order</dd>
         </dl>
     }
-    else if (Model.Mode == "Delete" && Model.SelectedSetting is not null)
-    {
-        <p>Delete setting <strong>@Model.SelectedSetting.Name</strong>? This action cannot be undone.</p>
-        <form method="post" asp-page-handler="Delete" asp-route-id="@Model.SelectedSetting.Id">
-            <button type="submit" class="btn btn-danger">Confirm delete</button>
-            <a asp-page="./Index" class="btn btn-outline-secondary">Cancel</a>
-        </form>
-    }
     else if (Model.Mode == "Create" || Model.Mode == "Edit")
     {
         <form method="post" asp-page-handler="@(Model.Mode == "Create" ? "Create" : "Edit")">
             <input type="hidden" asp-for="Input.Id" />
-            <div class="mb-3">
-                <label asp-for="Input.Code" class="form-label">Code</label>
-                <input asp-for="Input.Code" class="form-control" required />
-            </div>
+            @if (Model.Mode == "Create")
+            {
+                <div class="mb-3">
+                    <label asp-for="Input.Code" class="form-label">Code</label>
+                    <input asp-for="Input.Code" class="form-control" required />
+                </div>
+            }
+            else
+            {
+                <div class="mb-3">
+                    <label class="form-label">Code</label>
+                    <input class="form-control" value="@Model.Input.Code" readonly />
+                </div>
+            }
             <div class="mb-3">
                 <label asp-for="Input.Name" class="form-label">Name</label>
                 <input asp-for="Input.Name" class="form-control" required />
