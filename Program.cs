@@ -64,6 +64,9 @@ var runtime = app.Services.GetRequiredService<IAppRuntimeService>();
 if (runtime.AccessCode is { } startupCode)
 {
     await app.Services.GetRequiredService<IAppDatabaseService>().InitializeAsync(startupCode);
+    using var scope = app.Services.CreateScope();
+    await scope.ServiceProvider.GetRequiredService<IAppDataInitiationService>()
+        .InitializeAsync("12345678");
 }
 
 if (!app.Environment.IsDevelopment())
