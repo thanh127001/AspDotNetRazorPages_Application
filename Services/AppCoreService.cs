@@ -47,8 +47,7 @@ public sealed class AppCoreService : IAppCoreService
         }
         catch (Exception ex) when (ex is not OperationCanceledException || !cancellationToken.IsCancellationRequested)
         {
-            _logger.LogError(ex, "GetSettingsAsync failed");
-            return AppResultModel<List<AppSettingModel>>.Fail("An error occurred while processing the request.", ex.Message);
+            return AppErrorLog.Fail<List<AppSettingModel>>(_logger, ex, nameof(GetSettingsAsync));
         }
     }
 
@@ -69,8 +68,7 @@ public sealed class AppCoreService : IAppCoreService
         }
         catch (Exception ex) when (ex is not OperationCanceledException || !cancellationToken.IsCancellationRequested)
         {
-            _logger.LogError(ex, "GetSettingAsync failed");
-            return AppResultModel<AppSettingModel>.Fail("An error occurred while processing the request.", ex.Message);
+            return AppErrorLog.Fail<AppSettingModel>(_logger, ex, nameof(GetSettingAsync));
         }
     }
 
@@ -116,8 +114,7 @@ public sealed class AppCoreService : IAppCoreService
         }
         catch (Exception ex) when (ex is not OperationCanceledException || !cancellationToken.IsCancellationRequested)
         {
-            _logger.LogError(ex, "CreateSettingAsync failed");
-            return AppResultModel<string>.Fail("An error occurred while processing the request.", ex.Message);
+            return AppErrorLog.Fail<string>(_logger, ex, nameof(CreateSettingAsync));
         }
     }
 
@@ -174,8 +171,7 @@ public sealed class AppCoreService : IAppCoreService
         }
         catch (Exception ex) when (ex is not OperationCanceledException || !cancellationToken.IsCancellationRequested)
         {
-            _logger.LogError(ex, "UpdateSettingAsync failed");
-            return AppResultModel<bool>.Fail("An error occurred while processing the request.", ex.Message);
+            return AppErrorLog.Fail<bool>(_logger, ex, nameof(UpdateSettingAsync));
         }
     }
 
@@ -198,8 +194,7 @@ public sealed class AppCoreService : IAppCoreService
         }
         catch (Exception ex) when (ex is not OperationCanceledException || !cancellationToken.IsCancellationRequested)
         {
-            _logger.LogError(ex, "DeleteSettingAsync failed");
-            return AppResultModel<bool>.Fail("An error occurred while processing the request.", ex.Message);
+            return AppErrorLog.Fail<bool>(_logger, ex, nameof(DeleteSettingAsync));
         }
     }
 
@@ -212,8 +207,7 @@ public sealed class AppCoreService : IAppCoreService
         }
         catch (Exception ex) when (ex is not OperationCanceledException || !cancellationToken.IsCancellationRequested)
         {
-            _logger.LogError(ex, "GetUsersAsync failed");
-            return AppResultModel<List<AppUserModel>>.Fail("An error occurred while processing the request.", ex.Message);
+            return AppErrorLog.Fail<List<AppUserModel>>(_logger, ex, nameof(GetUsersAsync));
         }
     }
 
@@ -234,8 +228,7 @@ public sealed class AppCoreService : IAppCoreService
         }
         catch (Exception ex) when (ex is not OperationCanceledException || !cancellationToken.IsCancellationRequested)
         {
-            _logger.LogError(ex, "GetUserAsync failed");
-            return AppResultModel<AppUserModel>.Fail("An error occurred while processing the request.", ex.Message);
+            return AppErrorLog.Fail<AppUserModel>(_logger, ex, nameof(GetUserAsync));
         }
     }
 
@@ -303,8 +296,7 @@ public sealed class AppCoreService : IAppCoreService
         }
         catch (Exception ex) when (ex is not OperationCanceledException || !cancellationToken.IsCancellationRequested)
         {
-            _logger.LogError(ex, "CreateUserAsync failed");
-            return AppResultModel<string>.Fail("An error occurred while processing the request.", ex.Message);
+            return AppErrorLog.Fail<string>(_logger, ex, nameof(CreateUserAsync));
         }
     }
 
@@ -386,8 +378,7 @@ public sealed class AppCoreService : IAppCoreService
         }
         catch (Exception ex) when (ex is not OperationCanceledException || !cancellationToken.IsCancellationRequested)
         {
-            _logger.LogError(ex, "UpdateUserAsync failed");
-            return AppResultModel<bool>.Fail("An error occurred while processing the request.", ex.Message);
+            return AppErrorLog.Fail<bool>(_logger, ex, nameof(UpdateUserAsync));
         }
     }
 
@@ -410,8 +401,7 @@ public sealed class AppCoreService : IAppCoreService
         }
         catch (Exception ex) when (ex is not OperationCanceledException || !cancellationToken.IsCancellationRequested)
         {
-            _logger.LogError(ex, "DeleteUserAsync failed");
-            return AppResultModel<bool>.Fail("An error occurred while processing the request.", ex.Message);
+            return AppErrorLog.Fail<bool>(_logger, ex, nameof(DeleteUserAsync));
         }
     }
 }
