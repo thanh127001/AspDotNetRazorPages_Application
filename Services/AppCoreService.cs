@@ -18,6 +18,12 @@ public sealed class AppCoreService : IAppCoreService
 
     private const int MaxFileSize = 1024 * 1024;
 
+    private static bool IsSafeFileName(string name) =>
+        !string.IsNullOrWhiteSpace(name) && name.Length <= 255 &&
+        name == Path.GetFileName(name) && name is not ("." or "..") &&
+        name.IndexOfAny(new[] { '/', '\\', ':' }) < 0;
+
+
     private static bool TryGetFileType(string? fileName, byte[]? content, out string fileType)
     {
         fileType = string.Empty;
@@ -98,10 +104,13 @@ public sealed class AppCoreService : IAppCoreService
             return AppResultModel<string>.Fail("Only valid PNG, JPG, TXT and PDF files up to 1 MB are allowed.");
         try
         {
+            var name = Path.GetFileName(input.FileName);
+            if (!IsSafeFileName(name) || await _db.AppFiles.AnyAsync(x => x.FileName == name, cancellationToken))
+                return AppResultModel<string>.Fail("Invalid or duplicate file name.");
             var file = new AppFile
             {
                 Id = AppIdGenerator.GenerateId(),
-                FileName = Path.GetFileName(input.FileName),
+                FileName = name,
                 FileType = type,
                 FileSize = input.FileContent.Length,
                 FileContent = input.FileContent,
@@ -130,6 +139,8 @@ public sealed class AppCoreService : IAppCoreService
             if (name.Length == 0 || name.Length > 255 ||
                 !string.Equals(Path.GetExtension(name), Path.GetExtension(file.FileName), StringComparison.OrdinalIgnoreCase))
                 return AppResultModel<bool>.Fail("Only the file name may change; the extension must remain the same.");
+            if (!IsSafeFileName(name) || await _db.AppFiles.AnyAsync(x => x.Id != id && x.FileName == name, cancellationToken))
+                return AppResultModel<bool>.Fail("Invalid or duplicate file name.");
             file.FileName = name;
             await _db.SaveChangesAsync(cancellationToken);
             return AppResultModel<bool>.Ok(true, "File renamed successfully.");
