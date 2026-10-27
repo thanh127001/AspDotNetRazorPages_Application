@@ -1,10 +1,18 @@
+@inject Application.Services.IAppRuntimeService Runtime
+@{
+    var appName = Runtime.GetSettingValue("app-name");
+    var appDescription = Runtime.GetSettingValue("app-description");
+    var appCopyright = Runtime.GetSettingValue("app-copyright");
+}
+
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - Application</title>
+    <title>@ViewData["Title"] - @appName</title>
+    <meta name="description" content="@appDescription" />
 
     <script type="importmap"></script>
 
@@ -20,7 +28,7 @@
         <div class="container">
 
             <a class="navbar-brand" id="app-navbar-brand" asp-page="/Index" asp-route-id="">
-                Application
+                @appName
             </a>
 
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
@@ -63,7 +71,7 @@
     <!-- Footer -->
     <footer class="footer mt-auto py-3 bg-body border-top shadow-sm">
         <div class="container">
-            This is footer
+            @appCopyright
         </div>
     </footer>
 
