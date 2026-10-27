@@ -47,6 +47,29 @@ public sealed class AppCoreService : IAppCoreService
         }
     }
 
+    public async Task<string> GetSettingValueAsync(string? code, CancellationToken cancellationToken = default)
+    {
+        if (string.IsNullOrWhiteSpace(code))
+        {
+            return string.Empty;
+        }
+
+        try
+        {
+            var value = await _db.AppSettings.AsNoTracking()
+                .Where(x => x.Code == code.Trim())
+                .Select(x => x.Value)
+                .FirstOrDefaultAsync(cancellationToken);
+
+            return value ?? string.Empty;
+        }
+        catch (Exception ex)
+        {
+            AppErrorLog.Log(_logger, ex, nameof(GetSettingValueAsync));
+            return string.Empty;
+        }
+    }
+
     public async Task<AppResultModel<AppSettingModel>> GetSettingAsync(string id, CancellationToken cancellationToken = default)
     {
         try
