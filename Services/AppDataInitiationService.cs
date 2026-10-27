@@ -22,12 +22,19 @@ public sealed class AppDataInitiationService : IAppDataInitiationService
                 nameof(administratorPassword));
         }
 
+        await InitializeAdministratorAsync(administratorPassword, cancellationToken);
+        await InitializeSettingsAsync(cancellationToken);
+    }
+
+    private async Task InitializeAdministratorAsync(
+        string administratorPassword,
+        CancellationToken cancellationToken)
+    {
         var result = await _core.GetUsersAsync(cancellationToken);
 
         if (!result.Success)
         {
-            throw new InvalidOperationException(
-                string.Join(" ", result.Messages));
+            throw new InvalidOperationException(string.Join(" ", result.Messages));
         }
 
         if (result.Data is { Count: > 0 })
@@ -35,21 +42,51 @@ public sealed class AppDataInitiationService : IAppDataInitiationService
             return;
         }
 
-        var input = new AppUserModel
+        var created = await _core.CreateUserAsync(new AppUserModel
         {
             Code = "administrator",
             Username = "administrator",
             Password = administratorPassword,
             Role = 1,
             Status = 1
-        };
-
-        var created = await _core.CreateUserAsync(input, cancellationToken);
+        }, cancellationToken);
 
         if (!created.Success)
         {
-            throw new InvalidOperationException(
-                string.Join(" ", created.Messages));
+            throw new InvalidOperationException(string.Join(" ", created.Messages));
+        }
+    }
+
+    private async Task InitializeSettingsAsync(CancellationToken cancellationToken)
+    {
+        var result = await _core.GetSettingsAsync(cancellationToken);
+
+        if (!result.Success)
+        {
+            throw new InvalidOperationException(string.Join(" ", result.Messages));
+        }
+
+        if (result.Data is { Count: > 0 })
+        {
+            return;
+        }
+
+        var settings = new[]
+        {
+            new AppSettingModel { Code = "app-name", Name = "App Name", Value = "Application", Order = 1 },
+            new AppSettingModel { Code = "app-description", Name = "App Description", Value = "", Order = 2 },
+            new AppSettingModel { Code = "app-icon", Name = "App Icon", Value = "", Order = 3 },
+            new AppSettingModel { Code = "app-favicon", Name = "App Favicon", Value = "", Order = 4 },
+            new AppSettingModel { Code = "app-copyright", Name = "App Copyright", Value = "", Order = 5 }
+        };
+
+        foreach (var setting in settings)
+        {
+            var created = await _core.CreateSettingAsync(setting, cancellationToken);
+            if (!created.Success)
+            {
+                throw new InvalidOperationException(string.Join(" ", created.Messages));
+            }
         }
     }
 }
