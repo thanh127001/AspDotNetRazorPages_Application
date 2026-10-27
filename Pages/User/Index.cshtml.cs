@@ -1,33 +1,33 @@
-using Application.Models;
+using Application.Actionls;
 using Application.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace Application.Pages.User;
 
-public class IndexModel : PageModel
+public class IndexActionl : PageActionl
 {
     private readonly IAppCoreService _core;
 
-    public IndexModel(IAppCoreService core)
+    public IndexActionl(IAppCoreService core)
     {
         _core = core;
     }
 
-    public List<AppUserModel> Users { get; private set; } = new();
-    public AppUserModel? SelectedUser { get; private set; }
-    public string Mode { get; private set; } = "List";
+    public List<AppUserActionl> Users { get; private set; } = new();
+    public AppUserActionl? SelectedUser { get; private set; }
+    public string Action { get; private set; } = "List";
     public List<string> Messages { get; private set; } = new();
 
     [BindProperty]
-    public AppUserModel Input { get; set; } = new();
+    public AppUserActionl Input { get; set; } = new();
 
     [TempData]
     public string? Notice { get; set; }
 
-    public async Task<IActionResult> OnGetAsync(string? mode, string? id, CancellationToken cancellationToken)
+    public async Task<IActionResult> OnGetAsync(string? action, string? id, CancellationToken cancellationToken)
     {
-        Mode = (mode ?? "List").ToLowerInvariant() switch
+        Action = (action ?? "List").ToLowerInvariant() switch
         {
             "create" => "Create",
             "edit" => "Edit",
@@ -36,7 +36,7 @@ public class IndexModel : PageModel
             _ => "List"
         };
 
-        if (Mode == "List")
+        if (Action == "List")
         {
             var result = await _core.GetUsersAsync(cancellationToken);
             if (result.Success)
@@ -50,7 +50,7 @@ public class IndexModel : PageModel
             return Page();
         }
 
-        if (Mode == "Create")
+        if (Action == "Create")
         {
             return Page();
         }
@@ -74,7 +74,7 @@ public class IndexModel : PageModel
 
     public async Task<IActionResult> OnPostCreateAsync(CancellationToken cancellationToken)
     {
-        Mode = "Create";
+        Action = "Create";
         var result = await _core.CreateUserAsync(Input, cancellationToken);
         if (!result.Success)
         {
@@ -87,7 +87,7 @@ public class IndexModel : PageModel
 
     public async Task<IActionResult> OnPostEditAsync(CancellationToken cancellationToken)
     {
-        Mode = "Edit";
+        Action = "Edit";
         var result = await _core.UpdateUserAsync(Input, cancellationToken);
         if (!result.Success)
         {
