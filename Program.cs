@@ -1,3 +1,5 @@
+using Serilog;
+using Serilog.Events;
 using Application.Data;
 using Application.Services;
 using Microsoft.EntityFrameworkCore;
@@ -5,6 +7,17 @@ using Microsoft.EntityFrameworkCore;
 SQLitePCL.Batteries_V2.Init();
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Host.UseSerilog((context, services, logger) => logger
+    .MinimumLevel.Information()
+    .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning)
+    .Enrich.FromLogContext()
+    .WriteTo.Console()
+    .WriteTo.File(
+        Path.Combine(context.HostingEnvironment.ContentRootPath, "Logs", "log-.txt"),
+        rollingInterval: RollingInterval.Day,
+        retainedFileCountLimit: 30,
+        shared: true));
 builder.Services.AddRazorPages();
 builder.Services.AddSingleton<AppRuntimeService>();
 builder.Services.AddSingleton<AppDatabaseService>();
