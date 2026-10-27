@@ -10,11 +10,13 @@ public class InitiationModel : PageModel
 {
     private readonly IAppRuntimeService _runtime;
     private readonly IAppDatabaseService _database;
+    private readonly IAppDataInitiationService _dataInitiation;
 
-    public InitiationModel(IAppRuntimeService runtime, IAppDatabaseService database)
+    public InitiationModel(IAppRuntimeService runtime, IAppDatabaseService database, IAppDataInitiationService dataInitiation)
     {
         _runtime = runtime;
         _database = database;
+        _dataInitiation = dataInitiation;
     }
 
     [BindProperty, Required]
@@ -34,6 +36,7 @@ public class InitiationModel : PageModel
         try
         {
             await _database.InitializeAsync(AccessCode, cancellationToken);
+            await _dataInitiation.InitializeAsync("12345678", cancellationToken);
             return RedirectToPage("/Index");
         }
         catch (Exception ex) when (ex is SqliteException or InvalidOperationException)
