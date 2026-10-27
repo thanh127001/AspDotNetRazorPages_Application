@@ -49,11 +49,6 @@ public sealed class AppCoreService : IAppCoreService
         }
     }
 
-    public Task<string> GetSettingValueAsync(string? code, CancellationToken cancellationToken = default)
-    {
-        return Task.FromResult(_runtime.GetSettingValue(code));
-    }
-
     public async Task<AppResultModel<AppSettingModel>> GetSettingAsync(string id, CancellationToken cancellationToken = default)
     {
         try
