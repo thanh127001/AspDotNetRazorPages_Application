@@ -8,8 +8,8 @@ namespace Application.Pages.File;
 public class IndexModel : PageModel
 {
     private readonly IAppCoreService _core;
-    private readonly AppFileCacheService _fileCache;
-    public IndexModel(IAppCoreService core, AppFileCacheService fileCache)
+    private readonly IAppFileCacheService _fileCache;
+    public IndexModel(IAppCoreService core, IAppFileCacheService fileCache)
     {
         _core = core;
         _fileCache = fileCache;
