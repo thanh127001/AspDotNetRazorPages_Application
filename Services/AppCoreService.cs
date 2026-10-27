@@ -47,7 +47,8 @@ public sealed class AppCoreService : IAppCoreService
         }
         catch (Exception ex) when (ex is not OperationCanceledException || !cancellationToken.IsCancellationRequested)
         {
-            return AppErrorLog.Fail<List<AppSettingModel>>(_logger, ex, nameof(GetSettingsAsync));
+            var errorId = AppErrorLog.Log(_logger, ex, nameof(GetSettingsAsync));
+            return AppResultModel<List<AppSettingModel>>.Fail($"An error occurred while processing the request. Error ID: {errorId}");
         }
     }
 
@@ -68,7 +69,8 @@ public sealed class AppCoreService : IAppCoreService
         }
         catch (Exception ex) when (ex is not OperationCanceledException || !cancellationToken.IsCancellationRequested)
         {
-            return AppErrorLog.Fail<AppSettingModel>(_logger, ex, nameof(GetSettingAsync));
+            var errorId = AppErrorLog.Log(_logger, ex, nameof(GetSettingAsync));
+            return AppResultModel<AppSettingModel>.Fail($"An error occurred while processing the request. Error ID: {errorId}");
         }
     }
 
@@ -114,7 +116,8 @@ public sealed class AppCoreService : IAppCoreService
         }
         catch (Exception ex) when (ex is not OperationCanceledException || !cancellationToken.IsCancellationRequested)
         {
-            return AppErrorLog.Fail<string>(_logger, ex, nameof(CreateSettingAsync));
+            var errorId = AppErrorLog.Log(_logger, ex, nameof(CreateSettingAsync));
+            return AppResultModel<string>.Fail($"An error occurred while processing the request. Error ID: {errorId}");
         }
     }
 
@@ -171,7 +174,8 @@ public sealed class AppCoreService : IAppCoreService
         }
         catch (Exception ex) when (ex is not OperationCanceledException || !cancellationToken.IsCancellationRequested)
         {
-            return AppErrorLog.Fail<bool>(_logger, ex, nameof(UpdateSettingAsync));
+            var errorId = AppErrorLog.Log(_logger, ex, nameof(UpdateSettingAsync));
+            return AppResultModel<bool>.Fail($"An error occurred while processing the request. Error ID: {errorId}");
         }
     }
 
@@ -194,7 +198,8 @@ public sealed class AppCoreService : IAppCoreService
         }
         catch (Exception ex) when (ex is not OperationCanceledException || !cancellationToken.IsCancellationRequested)
         {
-            return AppErrorLog.Fail<bool>(_logger, ex, nameof(DeleteSettingAsync));
+            var errorId = AppErrorLog.Log(_logger, ex, nameof(DeleteSettingAsync));
+            return AppResultModel<bool>.Fail($"An error occurred while processing the request. Error ID: {errorId}");
         }
     }
 
@@ -207,7 +212,8 @@ public sealed class AppCoreService : IAppCoreService
         }
         catch (Exception ex) when (ex is not OperationCanceledException || !cancellationToken.IsCancellationRequested)
         {
-            return AppErrorLog.Fail<List<AppUserModel>>(_logger, ex, nameof(GetUsersAsync));
+            var errorId = AppErrorLog.Log(_logger, ex, nameof(GetUsersAsync));
+            return AppResultModel<List<AppUserModel>>.Fail($"An error occurred while processing the request. Error ID: {errorId}");
         }
     }
 
@@ -228,7 +234,8 @@ public sealed class AppCoreService : IAppCoreService
         }
         catch (Exception ex) when (ex is not OperationCanceledException || !cancellationToken.IsCancellationRequested)
         {
-            return AppErrorLog.Fail<AppUserModel>(_logger, ex, nameof(GetUserAsync));
+            var errorId = AppErrorLog.Log(_logger, ex, nameof(GetUserAsync));
+            return AppResultModel<AppUserModel>.Fail($"An error occurred while processing the request. Error ID: {errorId}");
         }
     }
 
@@ -296,7 +303,8 @@ public sealed class AppCoreService : IAppCoreService
         }
         catch (Exception ex) when (ex is not OperationCanceledException || !cancellationToken.IsCancellationRequested)
         {
-            return AppErrorLog.Fail<string>(_logger, ex, nameof(CreateUserAsync));
+            var errorId = AppErrorLog.Log(_logger, ex, nameof(CreateUserAsync));
+            return AppResultModel<string>.Fail($"An error occurred while processing the request. Error ID: {errorId}");
         }
     }
 
@@ -378,7 +386,8 @@ public sealed class AppCoreService : IAppCoreService
         }
         catch (Exception ex) when (ex is not OperationCanceledException || !cancellationToken.IsCancellationRequested)
         {
-            return AppErrorLog.Fail<bool>(_logger, ex, nameof(UpdateUserAsync));
+            var errorId = AppErrorLog.Log(_logger, ex, nameof(UpdateUserAsync));
+            return AppResultModel<bool>.Fail($"An error occurred while processing the request. Error ID: {errorId}");
         }
     }
 
@@ -401,7 +410,8 @@ public sealed class AppCoreService : IAppCoreService
         }
         catch (Exception ex) when (ex is not OperationCanceledException || !cancellationToken.IsCancellationRequested)
         {
-            return AppErrorLog.Fail<bool>(_logger, ex, nameof(DeleteUserAsync));
+            var errorId = AppErrorLog.Log(_logger, ex, nameof(DeleteUserAsync));
+            return AppResultModel<bool>.Fail($"An error occurred while processing the request. Error ID: {errorId}");
         }
     }
 }
