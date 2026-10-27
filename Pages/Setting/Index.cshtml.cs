@@ -32,7 +32,6 @@ public class IndexModel : PageModel
             "create" => "Create",
             "edit" => "Edit",
             "details" => "Details",
-            "delete" => "Delete",
             _ => "List"
         };
 
@@ -98,10 +97,4 @@ public class IndexModel : PageModel
         return RedirectToPage();
     }
 
-    public async Task<IActionResult> OnPostDeleteAsync(string id, CancellationToken cancellationToken)
-    {
-        var result = await _core.DeleteSettingAsync(id, cancellationToken);
-        Notice = string.Join(" ", result.Messages);
-        return RedirectToPage();
-    }
 }
