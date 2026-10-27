@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Application.Services;
 
-public sealed class AppFileCacheService
+public sealed class AppFileCacheService : IAppFileCacheService
 {
     private readonly AppDbContext _db;
     private readonly string _directory;
