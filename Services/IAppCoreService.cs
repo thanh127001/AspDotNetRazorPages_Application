@@ -4,15 +4,15 @@ namespace Application.Services;
 
 public interface IAppCoreService
 {
-    Task<List<AppSettingModel>> GetSettingsAsync();
-    Task<AppSettingModel?> GetSettingAsync(string id);
-    Task<AppSettingModel> CreateSettingAsync(AppSettingModel model);
-    Task<bool> UpdateSettingAsync(AppSettingModel model);
-    Task<bool> DeleteSettingAsync(string id);
+    Task<AppResult<List<AppSettingModel>>> GetSettingsAsync();
+    Task<AppResult<AppSettingModel>> GetSettingAsync(string id);
+    Task<AppResult<AppSettingModel>> CreateSettingAsync(AppSettingModel model);
+    Task<AppResult<bool>> UpdateSettingAsync(AppSettingModel model);
+    Task<AppResult<bool>> DeleteSettingAsync(string id);
 
-    Task<List<AppUserModel>> GetUsersAsync();
-    Task<AppUserModel?> GetUserAsync(string id);
-    Task<AppUserModel> CreateUserAsync(AppUserModel model);
-    Task<bool> UpdateUserAsync(AppUserModel model);
-    Task<bool> DeleteUserAsync(string id);
+    Task<AppResult<List<AppUserModel>>> GetUsersAsync();
+    Task<AppResult<AppUserModel>> GetUserAsync(string id);
+    Task<AppResult<AppUserModel>> CreateUserAsync(AppUserModel model);
+    Task<AppResult<bool>> UpdateUserAsync(AppUserModel model);
+    Task<AppResult<bool>> DeleteUserAsync(string id);
 }
