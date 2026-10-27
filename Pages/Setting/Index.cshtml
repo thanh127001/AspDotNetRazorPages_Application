@@ -1,0 +1,105 @@
+@page
+@model Application.Pages.Setting.IndexModel
+@{
+    ViewData["Title"] = "Setting Management";
+}
+
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1 class="h3 mb-0">Settings / @Model.Mode</h1>
+        @if (Model.Mode == "List")
+        {
+            <a asp-page="./Index" asp-route-mode="Create" class="btn btn-primary">Create setting</a>
+        }
+        else
+        {
+            <a asp-page="./Index" class="btn btn-outline-secondary">Back to list</a>
+        }
+    </div>
+
+    @if (!string.IsNullOrWhiteSpace(Model.Notice))
+    {
+        <div class="alert alert-info">@Model.Notice</div>
+    }
+    @if (Model.Messages.Count > 0)
+    {
+        <div class="alert alert-danger">
+            <ul class="mb-0">
+                @foreach (var message in Model.Messages)
+                {
+                    <li>@message</li>
+                }
+            </ul>
+        </div>
+    }
+
+    @if (Model.Mode == "List")
+    {
+        <div class="table-responsive">
+            <table class="table table-striped table-hover align-middle">
+                <thead><tr><th>Code</th><th>Name</th><th>Value</th><th>Order</th><th>Actions</th></tr></thead>
+                <tbody>
+                    @foreach (var setting in Model.Settings)
+                    {
+                        <tr>
+                            <td>@setting.Code</td>
+                            <td>@setting.Name</td>
+                            <td class="text-break">@setting.Value</td>
+                            <td>@setting.Order</td>
+                            <td class="text-nowrap">
+                                <a asp-page="./Index" asp-route-mode="Details" asp-route-id="@setting.Id" class="btn btn-sm btn-outline-secondary">Details</a>
+                                <a asp-page="./Index" asp-route-mode="Edit" asp-route-id="@setting.Id" class="btn btn-sm btn-outline-primary">Edit</a>
+                                <a asp-page="./Index" asp-route-mode="Delete" asp-route-id="@setting.Id" class="btn btn-sm btn-outline-danger">Delete</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        @if (Model.Settings.Count == 0 && Model.Messages.Count == 0)
+        {
+            <p class="text-muted">No settings found.</p>
+        }
+    }
+    else if (Model.Mode == "Details" && Model.SelectedSetting is not null)
+    {
+        <dl class="row">
+            <dt class="col-sm-3">Code</dt><dd class="col-sm-9">@Model.SelectedSetting.Code</dd>
+            <dt class="col-sm-3">Name</dt><dd class="col-sm-9">@Model.SelectedSetting.Name</dd>
+            <dt class="col-sm-3">Value</dt><dd class="col-sm-9 text-break" style="white-space: pre-wrap">@Model.SelectedSetting.Value</dd>
+            <dt class="col-sm-3">Order</dt><dd class="col-sm-9">@Model.SelectedSetting.Order</dd>
+        </dl>
+    }
+    else if (Model.Mode == "Delete" && Model.SelectedSetting is not null)
+    {
+        <p>Delete setting <strong>@Model.SelectedSetting.Name</strong>? This action cannot be undone.</p>
+        <form method="post" asp-page-handler="Delete" asp-route-id="@Model.SelectedSetting.Id">
+            <button type="submit" class="btn btn-danger">Confirm delete</button>
+            <a asp-page="./Index" class="btn btn-outline-secondary">Cancel</a>
+        </form>
+    }
+    else if (Model.Mode == "Create" || Model.Mode == "Edit")
+    {
+        <form method="post" asp-page-handler="@(Model.Mode == "Create" ? "Create" : "Edit")">
+            <input type="hidden" asp-for="Input.Id" />
+            <div class="mb-3">
+                <label asp-for="Input.Code" class="form-label">Code</label>
+                <input asp-for="Input.Code" class="form-control" required />
+            </div>
+            <div class="mb-3">
+                <label asp-for="Input.Name" class="form-label">Name</label>
+                <input asp-for="Input.Name" class="form-control" required />
+            </div>
+            <div class="mb-3">
+                <label asp-for="Input.Value" class="form-label">Value</label>
+                <textarea asp-for="Input.Value" class="form-control" rows="5"></textarea>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Input.Order" class="form-label">Order</label>
+                <input asp-for="Input.Order" type="number" class="form-control" />
+            </div>
+            <button type="submit" class="btn btn-primary">Save</button>
+            <a asp-page="./Index" class="btn btn-outline-secondary">Cancel</a>
+        </form>
+    }
+</div>
