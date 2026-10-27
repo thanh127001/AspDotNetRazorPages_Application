@@ -30,7 +30,6 @@ public sealed class AppCoreService : IAppCoreService
         Id = entity.Id,
         Code = entity.Code,
         Username = entity.Username,
-        Password = entity.Password,
         Email = entity.Email,
         PhoneNumber = entity.PhoneNumber,
         Status = entity.Status,
@@ -88,7 +87,7 @@ public sealed class AppCoreService : IAppCoreService
             {
                 errors.Add("Setting code is required.");
             }
-            else if (await _db.AppSettings.AnyAsync(x => x.Code == model.Code && true))
+            else if (await _db.AppSettings.AnyAsync(x => x.Code == model.Code))
             {
                 errors.Add("Setting code already exists.");
             }
@@ -96,7 +95,7 @@ public sealed class AppCoreService : IAppCoreService
             {
                 errors.Add("Setting name is required.");
             }
-            else if (await _db.AppSettings.AnyAsync(x => x.Name == model.Name && true))
+            else if (await _db.AppSettings.AnyAsync(x => x.Name == model.Name))
             {
                 errors.Add("Setting name already exists.");
             }
@@ -245,12 +244,13 @@ public sealed class AppCoreService : IAppCoreService
             model.Code = model.Code?.Trim();
             model.Username = model.Username?.Trim() ?? string.Empty;
             model.Email = model.Email?.Trim();
+            model.PhoneNumber = model.PhoneNumber?.Trim();
             var errors = new List<string>();
             if (string.IsNullOrWhiteSpace(model.Code))
             {
                 errors.Add("User code is required.");
             }
-            else if (await _db.AppUsers.AnyAsync(x => x.Code == model.Code ))
+            else if (await _db.AppUsers.AnyAsync(x => x.Code == model.Code))
             {
                 errors.Add("User code already exists.");
             }
@@ -258,7 +258,7 @@ public sealed class AppCoreService : IAppCoreService
             {
                 errors.Add("Username is required.");
             }
-            else if (await _db.AppUsers.AnyAsync(x => x.Username == model.Username ))
+            else if (await _db.AppUsers.AnyAsync(x => x.Username == model.Username))
             {
                 errors.Add("Username already exists.");
             }
@@ -266,9 +266,17 @@ public sealed class AppCoreService : IAppCoreService
             {
                 errors.Add("Password is required.");
             }
+            else if (model.Password.Length < 6)
+            {
+                errors.Add("Password must be at least 6 characters long.");
+            }
             if (!string.IsNullOrWhiteSpace(model.Email) && !new System.ComponentModel.DataAnnotations.EmailAddressAttribute().IsValid(model.Email))
             {
                 errors.Add("Email is invalid.");
+            }
+            if (!string.IsNullOrWhiteSpace(model.PhoneNumber) && !new System.ComponentModel.DataAnnotations.PhoneAttribute().IsValid(model.PhoneNumber))
+            {
+                errors.Add("Phone number is invalid.");
             }
             if (errors.Count > 0)
             {
@@ -301,6 +309,7 @@ public sealed class AppCoreService : IAppCoreService
             model.Code = model.Code?.Trim();
             model.Username = model.Username?.Trim() ?? string.Empty;
             model.Email = model.Email?.Trim();
+            model.PhoneNumber = model.PhoneNumber?.Trim();
             var errors = new List<string>();
             if (string.IsNullOrWhiteSpace(model.Code))
             {
@@ -318,10 +327,17 @@ public sealed class AppCoreService : IAppCoreService
             {
                 errors.Add("Username already exists.");
             }
-            
+            if (!string.IsNullOrWhiteSpace(model.Password) && model.Password.Length < 6)
+            {
+                errors.Add("Password must be at least 6 characters long.");
+            }
             if (!string.IsNullOrWhiteSpace(model.Email) && !new System.ComponentModel.DataAnnotations.EmailAddressAttribute().IsValid(model.Email))
             {
                 errors.Add("Email is invalid.");
+            }
+            if (!string.IsNullOrWhiteSpace(model.PhoneNumber) && !new System.ComponentModel.DataAnnotations.PhoneAttribute().IsValid(model.PhoneNumber))
+            {
+                errors.Add("Phone number is invalid.");
             }
             if (errors.Count > 0)
             {
