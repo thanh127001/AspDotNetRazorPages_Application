@@ -423,6 +423,10 @@ public sealed class AppCoreService : IAppCoreService
             {
                 return AppResultModel<bool>.Fail("User not found.");
             }
+            if (string.Equals(entity.Username, "administrator", StringComparison.OrdinalIgnoreCase))
+            {
+                return AppResultModel<bool>.Fail("The administrator account cannot be deleted.");
+            }
             _db.AppUsers.Remove(entity);
             await _db.SaveChangesAsync(cancellationToken);
             return AppResultModel<bool>.Ok(true, "User deleted successfully.");
