@@ -76,14 +76,9 @@
     else if (Model.CurrentUser is not null)
     {
         <dl class="row">
-            <dt class="col-sm-4">Code</dt><dd class="col-sm-8">@Model.CurrentUser.Code</dd>
             <dt class="col-sm-4">Username</dt><dd class="col-sm-8">@Model.CurrentUser.Username</dd>
-            <dt class="col-sm-4">Email</dt><dd class="col-sm-8">@Model.CurrentUser.Email</dd>
-            <dt class="col-sm-4">Phone number</dt><dd class="col-sm-8">@Model.CurrentUser.PhoneNumber</dd>
             <dt class="col-sm-4">Status</dt><dd class="col-sm-8">@(Model.CurrentUser.Status == 1 ? "Active" : "Inactive")</dd>
             <dt class="col-sm-4">Role</dt><dd class="col-sm-8">@(Model.CurrentUser.Role == 1 ? "Administrator" : Model.CurrentUser.Role == 2 ? "Manager" : "User")</dd>
-            <dt class="col-sm-4">Created (UTC)</dt><dd class="col-sm-8">@Model.CurrentUser.DateCreated</dd>
-            <dt class="col-sm-4">Modified (UTC)</dt><dd class="col-sm-8">@Model.CurrentUser.DateModified</dd>
         </dl>
     }
 </div>
