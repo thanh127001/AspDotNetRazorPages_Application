@@ -1,26 +1,26 @@
-using Application.Actionls;
+using Application.Models;
 using Application.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace Application.Pages.User;
 
-public class IndexActionl : PageActionl
+public class IndexModel : PageModel
 {
     private readonly IAppCoreService _core;
 
-    public IndexActionl(IAppCoreService core)
+    public IndexModel(IAppCoreService core)
     {
         _core = core;
     }
 
-    public List<AppUserActionl> Users { get; private set; } = new();
-    public AppUserActionl? SelectedUser { get; private set; }
+    public List<AppUserModel> Users { get; private set; } = new();
+    public AppUserModel? SelectedUser { get; private set; }
     public string Action { get; private set; } = "List";
     public List<string> Messages { get; private set; } = new();
 
     [BindProperty]
-    public AppUserActionl Input { get; set; } = new();
+    public AppUserModel Input { get; set; } = new();
 
     [TempData]
     public string? Notice { get; set; }
