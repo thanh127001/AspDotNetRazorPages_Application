@@ -46,15 +46,10 @@ public sealed class AppCoreService : IAppCoreService
             var rows = await _db.AppSettings.AsNoTracking().OrderBy(x => x.Order).ThenBy(x => x.Name).ToListAsync();
             return AppResultModel<List<AppSettingModel>>.Ok(rows.Select(ToModel).ToList());
         }
-        catch (DbUpdateException ex)
-        {
-            _logger.LogError(ex, "GetSettingsAsync database error");
-            return AppResultModel<List<AppSettingModel>>.Fail("Unable to save or retrieve data. Please try again.", ex.Message);
-        }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "GetSettingsAsync unexpected error");
-            return AppResultModel<List<AppSettingModel>>.Fail("An unexpected error occurred.", ex.Message);
+            _logger.LogError(ex, "GetSettingsAsync failed");
+            return AppResultModel<List<AppSettingModel>>.Fail("An error occurred while processing the request.", ex.Message);
         }
     }
 
@@ -71,15 +66,10 @@ public sealed class AppCoreService : IAppCoreService
             }
             return AppResultModel<AppSettingModel>.Ok(ToModel(row));
         }
-        catch (DbUpdateException ex)
-        {
-            _logger.LogError(ex, "GetSettingAsync database error");
-            return AppResultModel<AppSettingModel>.Fail("Unable to save or retrieve data. Please try again.", ex.Message);
-        }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "GetSettingAsync unexpected error");
-            return AppResultModel<AppSettingModel>.Fail("An unexpected error occurred.", ex.Message);
+            _logger.LogError(ex, "GetSettingAsync failed");
+            return AppResultModel<AppSettingModel>.Fail("An error occurred while processing the request.", ex.Message);
         }
     }
 
@@ -108,15 +98,10 @@ public sealed class AppCoreService : IAppCoreService
             await _db.SaveChangesAsync();
             return AppResultModel<AppSettingModel>.Ok(ToModel(row), "Setting created successfully.");
         }
-        catch (DbUpdateException ex)
-        {
-            _logger.LogError(ex, "CreateSettingAsync database error");
-            return AppResultModel<AppSettingModel>.Fail("Unable to save or retrieve data. Please try again.", ex.Message);
-        }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "CreateSettingAsync unexpected error");
-            return AppResultModel<AppSettingModel>.Fail("An unexpected error occurred.", ex.Message);
+            _logger.LogError(ex, "CreateSettingAsync failed");
+            return AppResultModel<AppSettingModel>.Fail("An error occurred while processing the request.", ex.Message);
         }
     }
 
@@ -148,15 +133,10 @@ public sealed class AppCoreService : IAppCoreService
             await _db.SaveChangesAsync();
             return AppResultModel<bool>.Ok(true, "Setting updated successfully.");
         }
-        catch (DbUpdateException ex)
-        {
-            _logger.LogError(ex, "UpdateSettingAsync database error");
-            return AppResultModel<bool>.Fail("Unable to save or retrieve data. Please try again.", ex.Message);
-        }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "UpdateSettingAsync unexpected error");
-            return AppResultModel<bool>.Fail("An unexpected error occurred.", ex.Message);
+            _logger.LogError(ex, "UpdateSettingAsync failed");
+            return AppResultModel<bool>.Fail("An error occurred while processing the request.", ex.Message);
         }
     }
 
@@ -175,15 +155,10 @@ public sealed class AppCoreService : IAppCoreService
             await _db.SaveChangesAsync();
             return AppResultModel<bool>.Ok(true, "Setting deleted successfully.");
         }
-        catch (DbUpdateException ex)
-        {
-            _logger.LogError(ex, "DeleteSettingAsync database error");
-            return AppResultModel<bool>.Fail("Unable to save or retrieve data. Please try again.", ex.Message);
-        }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "DeleteSettingAsync unexpected error");
-            return AppResultModel<bool>.Fail("An unexpected error occurred.", ex.Message);
+            _logger.LogError(ex, "DeleteSettingAsync failed");
+            return AppResultModel<bool>.Fail("An error occurred while processing the request.", ex.Message);
         }
     }
 
@@ -194,15 +169,10 @@ public sealed class AppCoreService : IAppCoreService
             var rows = await _db.AppUsers.AsNoTracking().OrderBy(x => x.Username).ToListAsync();
             return AppResultModel<List<AppUserModel>>.Ok(rows.Select(ToModel).ToList());
         }
-        catch (DbUpdateException ex)
-        {
-            _logger.LogError(ex, "GetUsersAsync database error");
-            return AppResultModel<List<AppUserModel>>.Fail("Unable to save or retrieve data. Please try again.", ex.Message);
-        }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "GetUsersAsync unexpected error");
-            return AppResultModel<List<AppUserModel>>.Fail("An unexpected error occurred.", ex.Message);
+            _logger.LogError(ex, "GetUsersAsync failed");
+            return AppResultModel<List<AppUserModel>>.Fail("An error occurred while processing the request.", ex.Message);
         }
     }
 
@@ -219,15 +189,10 @@ public sealed class AppCoreService : IAppCoreService
             }
             return AppResultModel<AppUserModel>.Ok(ToModel(row));
         }
-        catch (DbUpdateException ex)
-        {
-            _logger.LogError(ex, "GetUserAsync database error");
-            return AppResultModel<AppUserModel>.Fail("Unable to save or retrieve data. Please try again.", ex.Message);
-        }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "GetUserAsync unexpected error");
-            return AppResultModel<AppUserModel>.Fail("An unexpected error occurred.", ex.Message);
+            _logger.LogError(ex, "GetUserAsync failed");
+            return AppResultModel<AppUserModel>.Fail("An error occurred while processing the request.", ex.Message);
         }
     }
 
@@ -262,15 +227,10 @@ public sealed class AppCoreService : IAppCoreService
             await _db.SaveChangesAsync();
             return AppResultModel<AppUserModel>.Ok(ToModel(row), "User created successfully.");
         }
-        catch (DbUpdateException ex)
-        {
-            _logger.LogError(ex, "CreateUserAsync database error");
-            return AppResultModel<AppUserModel>.Fail("Unable to save or retrieve data. Please try again.", ex.Message);
-        }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "CreateUserAsync unexpected error");
-            return AppResultModel<AppUserModel>.Fail("An unexpected error occurred.", ex.Message);
+            _logger.LogError(ex, "CreateUserAsync failed");
+            return AppResultModel<AppUserModel>.Fail("An error occurred while processing the request.", ex.Message);
         }
     }
 
@@ -309,15 +269,10 @@ public sealed class AppCoreService : IAppCoreService
             await _db.SaveChangesAsync();
             return AppResultModel<bool>.Ok(true, "User updated successfully.");
         }
-        catch (DbUpdateException ex)
-        {
-            _logger.LogError(ex, "UpdateUserAsync database error");
-            return AppResultModel<bool>.Fail("Unable to save or retrieve data. Please try again.", ex.Message);
-        }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "UpdateUserAsync unexpected error");
-            return AppResultModel<bool>.Fail("An unexpected error occurred.", ex.Message);
+            _logger.LogError(ex, "UpdateUserAsync failed");
+            return AppResultModel<bool>.Fail("An error occurred while processing the request.", ex.Message);
         }
     }
 
@@ -336,15 +291,10 @@ public sealed class AppCoreService : IAppCoreService
             await _db.SaveChangesAsync();
             return AppResultModel<bool>.Ok(true, "User deleted successfully.");
         }
-        catch (DbUpdateException ex)
-        {
-            _logger.LogError(ex, "DeleteUserAsync database error");
-            return AppResultModel<bool>.Fail("Unable to save or retrieve data. Please try again.", ex.Message);
-        }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "DeleteUserAsync unexpected error");
-            return AppResultModel<bool>.Fail("An unexpected error occurred.", ex.Message);
+            _logger.LogError(ex, "DeleteUserAsync failed");
+            return AppResultModel<bool>.Fail("An error occurred while processing the request.", ex.Message);
         }
     }
 }
