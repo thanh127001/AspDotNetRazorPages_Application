@@ -16,6 +16,43 @@ public sealed class AppCoreService : IAppCoreService
         _logger = logger;
     }
 
+    public async Task<AppResultModel<List<AppFileModel>>> GetFilesAsync(CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var files = await _db.AppFiles.AsNoTracking()
+                .OrderBy(x => x.Order).ThenBy(x => x.FileName)
+                .Select(x => new AppFileModel { Id = x.Id, FileName = x.FileName, FileType = x.FileType, FileSize = x.FileSize, Order = x.Order })
+                .ToListAsync(cancellationToken);
+            return AppResultModel<List<AppFileModel>>.Ok(files);
+        }
+        catch (Exception ex)
+        {
+            var errorId = AppErrorLog.Log(_logger, ex, nameof(GetFilesAsync));
+            return AppResultModel<List<AppFileModel>>.Fail($"Error ID: {errorId}");
+        }
+    }
+
+    public async Task<AppResultModel<AppFileModel>> GetFileAsync(string id, CancellationToken cancellationToken = default)
+    {
+        if (string.IsNullOrWhiteSpace(id)) return AppResultModel<AppFileModel>.Fail("File ID is required.");
+        try
+        {
+            var file = await _db.AppFiles.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
+            if (file is null) return AppResultModel<AppFileModel>.Fail("File not found.");
+            return AppResultModel<AppFileModel>.Ok(new AppFileModel
+            {
+                Id = file.Id, FileName = file.FileName, FileType = file.FileType,
+                FileSize = file.FileSize, FileContent = file.FileContent, Order = file.Order
+            });
+        }
+        catch (Exception ex)
+        {
+            var errorId = AppErrorLog.Log(_logger, ex, nameof(GetFileAsync));
+            return AppResultModel<AppFileModel>.Fail($"Error ID: {errorId}");
+        }
+    }
+
     private static AppSettingModel ToModel(AppSetting entity) => new()
     {
         Id = entity.Id,
