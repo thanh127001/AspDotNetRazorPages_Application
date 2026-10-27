@@ -8,6 +8,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorPages();
 builder.Services.AddSingleton<AppRuntimeService>();
 builder.Services.AddSingleton<AppDatabaseService>();
+builder.Services.AddScoped<IAppCoreService, AppCoreService>();
+builder.Services.AddScoped<Microsoft.AspNetCore.Identity.IPasswordHasher<AppUser>, Microsoft.AspNetCore.Identity.PasswordHasher<AppUser>>();
 builder.Services.AddDbContext<AppDbContext>((services, options) =>
 {
     var runtimeState = services.GetRequiredService<AppRuntimeService>();
