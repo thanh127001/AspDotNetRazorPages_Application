@@ -44,7 +44,6 @@ public sealed class AppDataInitiationService : IAppDataInitiationService
 
         var created = await _core.CreateUserAsync(new AppUserModel
         {
-            Code = "administrator",
             Username = "administrator",
             Password = administratorPassword,
             Role = 1,
