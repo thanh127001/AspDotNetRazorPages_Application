@@ -6,11 +6,13 @@ public sealed class AppDataInitiationService : IAppDataInitiationService
 {
     private readonly IAppCoreService _core;
     private readonly IAppRuntimeService _runtime;
+    private readonly AppFileCacheService _fileCache;
 
-    public AppDataInitiationService(IAppCoreService core, IAppRuntimeService runtime)
+    public AppDataInitiationService(IAppCoreService core, IAppRuntimeService runtime, AppFileCacheService fileCache)
     {
         _core = core;
         _runtime = runtime;
+        _fileCache = fileCache;
     }
 
     public async Task InitializeAsync(
@@ -30,6 +32,7 @@ public sealed class AppDataInitiationService : IAppDataInitiationService
         if (!settings.Success || settings.Data is null)
             throw new InvalidOperationException(string.Join(" ", settings.Messages));
         _runtime.SetSettings(settings.Data);
+        await _fileCache.RestoreMissingAsync(cancellationToken);
     }
 
     private async Task InitializeAdministratorAsync(
