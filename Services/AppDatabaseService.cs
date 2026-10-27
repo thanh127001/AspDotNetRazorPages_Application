@@ -4,13 +4,13 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Application.Services;
 
-public sealed class AppDatabaseService
+public sealed class AppDatabaseService : IAppDatabaseService
 {
     private readonly IServiceScopeFactory _scopes;
-    private readonly AppRuntimeService _runtime;
+    private readonly IAppRuntimeService _runtime;
     private readonly SemaphoreSlim _gate = new(1, 1);
 
-    public AppDatabaseService(IServiceScopeFactory scopes, AppRuntimeService runtime)
+    public AppDatabaseService(IServiceScopeFactory scopes, IAppRuntimeService runtime)
     {
         _scopes = scopes;
         _runtime = runtime;
