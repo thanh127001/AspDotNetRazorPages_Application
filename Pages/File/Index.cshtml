@@ -48,6 +48,7 @@
                     <td>@file.Order</td>
                     <td>
                         <div class="d-flex gap-2 flex-wrap">
+                            <button type="button" class="btn btn-sm btn-outline-success" data-file-path="@Application.Services.AppFileCacheService.GetUrl(file.Id, file.FileName)" onclick="copyFilePath(this)">Copy Path</button>
                             <a asp-page="./Index" asp-page-handler="Download" asp-route-id="@file.Id" class="btn btn-sm btn-outline-secondary">Download</a>
                             <form method="post" asp-page-handler="Edit" class="d-flex gap-1">
                                 <input type="hidden" name="Id" value="@file.Id" />
@@ -69,3 +70,17 @@
 {
     <p class="text-muted">No files found.</p>
 }
+
+<script>
+    async function copyFilePath(button) {
+        const path = button.dataset.filePath;
+        try {
+            await navigator.clipboard.writeText(path);
+            const original = button.textContent;
+            button.textContent = 'Copied!';
+            setTimeout(() => button.textContent = original, 1500);
+        } catch {
+            window.prompt('Copy file path:', path);
+        }
+    }
+</script>
