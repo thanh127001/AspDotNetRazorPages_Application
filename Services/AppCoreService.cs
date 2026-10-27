@@ -79,6 +79,47 @@ public sealed class AppCoreService : IAppCoreService
         }
     }
 
+    public async Task<AppResultModel<bool>> UpdateFileAsync(string id, string fileName, CancellationToken cancellationToken = default)
+    {
+        if (string.IsNullOrWhiteSpace(id) || string.IsNullOrWhiteSpace(fileName))
+            return AppResultModel<bool>.Fail("File ID and name are required.");
+        try
+        {
+            var file = await _db.AppFiles.FindAsync(new object[] { id }, cancellationToken);
+            if (file is null) return AppResultModel<bool>.Fail("File not found.");
+            var name = Path.GetFileName(fileName.Trim());
+            if (name.Length == 0 || name.Length > 255 ||
+                !string.Equals(Path.GetExtension(name), Path.GetExtension(file.FileName), StringComparison.OrdinalIgnoreCase))
+                return AppResultModel<bool>.Fail("Only the file name may change; the extension must remain the same.");
+            file.FileName = name;
+            await _db.SaveChangesAsync(cancellationToken);
+            return AppResultModel<bool>.Ok(true, "File renamed successfully.");
+        }
+        catch (Exception ex)
+        {
+            var errorId = AppErrorLog.Log(_logger, ex, nameof(UpdateFileAsync));
+            return AppResultModel<bool>.Fail($"Error ID: {errorId}");
+        }
+    }
+
+    public async Task<AppResultModel<bool>> DeleteFileAsync(string id, CancellationToken cancellationToken = default)
+    {
+        if (string.IsNullOrWhiteSpace(id)) return AppResultModel<bool>.Fail("File ID is required.");
+        try
+        {
+            var file = await _db.AppFiles.FindAsync(new object[] { id }, cancellationToken);
+            if (file is null) return AppResultModel<bool>.Fail("File not found.");
+            _db.AppFiles.Remove(file);
+            await _db.SaveChangesAsync(cancellationToken);
+            return AppResultModel<bool>.Ok(true, "File deleted successfully.");
+        }
+        catch (Exception ex)
+        {
+            var errorId = AppErrorLog.Log(_logger, ex, nameof(DeleteFileAsync));
+            return AppResultModel<bool>.Fail($"Error ID: {errorId}");
+        }
+    }
+
     private static AppSettingModel ToModel(AppSetting entity) => new()
     {
         Id = entity.Id,
