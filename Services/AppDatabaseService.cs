@@ -16,7 +16,16 @@ public sealed class AppDatabaseService : IAppDatabaseService
         _runtime = runtime;
     }
 
-    public static string DatabasePath => Path.Combine(AppContext.BaseDirectory, "AppData", "Application.db");
+    private static string _databasePath = Path.Combine(AppContext.BaseDirectory, "AppData", "Application.db");
+
+    public static string DatabasePath => _databasePath;
+
+    public static void ConfigureDatabasePath(string path)
+    {
+        if (string.IsNullOrWhiteSpace(path))
+            throw new ArgumentException("Database path is required.", nameof(path));
+        _databasePath = Path.GetFullPath(path);
+    }
 
     public static string ConnectionString(string code) => new SqliteConnectionStringBuilder
     {
