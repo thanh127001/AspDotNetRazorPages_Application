@@ -116,23 +116,29 @@ public sealed class AppDataInitiationService : IAppDataInitiationService
         if (!result.Success)
             throw new InvalidOperationException(string.Join(" ", result.Messages));
 
-        var defaults = new[]
+        var initialContents = new[]
         {
-            new AppContentModel { Code = "home", Title = "Home", Content = "<p>Welcome to our website.</p>", Status = 1, Order = 1 },
-            new AppContentModel { Code = "privacy", Title = "Privacy", Content = "<p>Privacy policy content.</p>", Status = 1, Order = 2 },
-            new AppContentModel { Code = "about", Title = "About", Content = "<p>About this website.</p>", Status = 1, Order = 3 }
+            new AppContentModel
+            {
+                Code = "home", Title = "Home", Icon = "bi bi-house",
+                Content = "<h2>Welcome to Application</h2><p>Application provides convenient online tools and services to help you with everyday office tasks.</p><p>Explore the available tools using the navigation menu.</p>",
+                Status = 1, Order = 1
+            },
+            new AppContentModel
+            {
+                Code = "sample-content-1", Title = "Sample Content 1",
+                Icon = "bi bi-file-earmark-text", Content = "<p>Sample content 1.</p>",
+                Status = 1, Order = 2
+            },
+            new AppContentModel
+            {
+                Code = "sample-content-2", Title = "Sample Content 2",
+                Icon = "bi bi-file-earmark-text", Content = "<p>Sample content 2.</p>",
+                Status = 1, Order = 3
+            }
         };
 
         var existing = result.Data ?? new List<AppContentModel>();
-        var initialContents = existing.Count == 0
-            ? defaults.Concat(new[]
-            {
-                new AppContentModel { Code = "sample-content-1", Title = "Sample Content 1", Icon = "bi bi-file-earmark-text", Content = "<p>Sample content 1.</p>", Status = 1, Order = 4 },
-                new AppContentModel { Code = "sample-content-2", Title = "Sample Content 2", Icon = "bi bi-file-earmark-text", Content = "<p>Sample content 2.</p>", Status = 1, Order = 5 },
-                new AppContentModel { Code = "sample-content-3", Title = "Sample Content 3", Icon = "bi bi-file-earmark-text", Content = "<p>Sample content 3.</p>", Status = 1, Order = 6 }
-            })
-            : defaults.AsEnumerable();
-
         foreach (var item in initialContents)
         {
             if (existing.Any(x => string.Equals(x.Code, item.Code, StringComparison.OrdinalIgnoreCase)))
