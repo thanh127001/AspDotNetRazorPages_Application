@@ -4,7 +4,7 @@
     var appDescription = Runtime.GetSettingValue("app-description");
     var appCopyright = Runtime.GetSettingValue("app-copyright");
     var currentPage = (ViewContext.RouteData.Values["page"]?.ToString() ?? "").TrimStart('/');
-    var adminPages = new[] { "Administration", "User", "Setting", "File" };
+    var adminPages = new[] { "Administration", "User", "Setting", "File", "Content" };
     var showAdminMenu = adminPages.Any(page =>
         currentPage.StartsWith(page, StringComparison.OrdinalIgnoreCase));
 }
