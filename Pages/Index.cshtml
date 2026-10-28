@@ -1,0 +1,15 @@
+@page
+@model Application.Pages.IndexModel
+@{
+    ViewData["Title"] = Model.Content?.Title ?? Model.ContentCode;
+}
+@if (Model.Content is not null)
+{
+    <h1>@Model.Content.Title</h1>
+    <div>@Html.Raw(Model.Content.Content)</div>
+}
+else
+{
+    <h1>@Model.ContentCode</h1>
+    <p>Content is not available.</p>
+}
