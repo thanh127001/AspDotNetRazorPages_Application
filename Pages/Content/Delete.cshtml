@@ -1,0 +1,26 @@
+@page "{id?}"
+@model Application.Pages.Content.DeleteModel
+@{
+    ViewData["Title"] = "Delete Content";
+}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1 class="h3 mb-0">Delete Content</h1>
+        <div class="d-flex gap-2">
+            <a asp-page="./Index" class="btn btn-outline-secondary">Back to list</a>
+        </div>
+    </div>
+    @if (!string.IsNullOrWhiteSpace(Model.Notice))
+    {
+        <div class="alert alert-info" role="alert">@Model.Notice</div>
+    }
+
+    @if (Model.SelectedContent is not null)
+    {
+        <p>Delete content <strong>@Model.SelectedContent.Title</strong>? This action cannot be undone.</p>
+        <form method="post" asp-page="./Delete" asp-route-id="@Model.SelectedContent.Id">
+            <button type="submit" class="btn btn-danger">Confirm delete</button>
+            <a asp-page="./Index" class="btn btn-outline-secondary">Cancel</a>
+        </form>
+    }
+</div>
