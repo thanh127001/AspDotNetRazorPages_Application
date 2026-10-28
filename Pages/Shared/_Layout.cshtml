@@ -51,7 +51,7 @@
                     @foreach (var content in customPages)
                     {
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-page="/Index" asp-route-code="@content.Code">@content.Title</a>
+                            <a class="nav-link text-dark" asp-page="/Index" asp-route-code="@content.Code"><i class="@(string.IsNullOrWhiteSpace(content.Icon) ? "bi bi-file-earmark-text" : content.Icon) me-1"></i>@content.Title</a>
                         </li>
                     }
                 </ul>
