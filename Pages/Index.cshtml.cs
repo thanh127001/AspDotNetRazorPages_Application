@@ -18,14 +18,9 @@ public class IndexModel : PageModel
     public AppContentModel? Content { get; private set; }
     public string ContentCode { get; private set; } = "home";
 
-    public async Task OnGetAsync(CancellationToken cancellationToken)
+    public async Task OnGetAsync(string? code, CancellationToken cancellationToken)
     {
-        ContentCode = Request.Path.Value?.TrimEnd('/').ToLowerInvariant() switch
-        {
-            "/privacy" => "privacy",
-            "/about" => "about",
-            _ => "home"
-        };
+        ContentCode = string.IsNullOrWhiteSpace(code) ? "Home" : code.Trim();
 
         var id = _runtime.GetContentId(ContentCode);
         if (string.IsNullOrEmpty(id)) return;
