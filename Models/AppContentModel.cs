@@ -11,5 +11,5 @@ public class AppContentModel
     public string Content { get; set; } = string.Empty;
     public string? Icon { get; set; } = null;
     public int Order { get; set; } = 0;
-    public bool Active { get; set; }= false;
+    public int Status { get; set; } = 0;
 }
