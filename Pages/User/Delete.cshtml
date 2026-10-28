@@ -1,0 +1,15 @@
+@page "{id?}"
+@model Application.Pages.User.DeleteModel
+@{ ViewData["Title"] = "Delete User"; }
+<div class="container py-4"><div class="d-flex justify-content-between align-items-center mb-3"><h1 class="h3 mb-0">Delete User</h1><div><a asp-page="./Index" class="btn btn-outline-secondary">Back to list</a></div></div>
+@if (!string.IsNullOrWhiteSpace(Model.Notice)) { <div class="alert alert-info" role="alert">@Model.Notice</div> }
+@if (Model.Messages.Count > 0) { <div class="alert alert-danger"><ul class="mb-0">@foreach(var message in Model.Messages){<li>@message</li>}</ul></div> }
+
+@if(Model.SelectedUser is not null) {
+        <p>Delete user <strong>@Model.SelectedUser.Username</strong>? This action cannot be undone.</p>
+        <form method="post" asp-route-id="@Model.SelectedUser.Id">
+            <button type="submit" class="btn btn-danger">Confirm delete</button>
+            <a asp-page="./Index" class="btn btn-outline-secondary">Cancel</a>
+        </form>
+}
+</div>

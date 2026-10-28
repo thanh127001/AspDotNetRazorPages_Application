@@ -1,43 +1,10 @@
 @page
 @model Application.Pages.User.IndexModel
-@{
-    ViewData["Title"] = "User Management";
-}
+@{ ViewData["Title"] = "User Management"; }
+<div class="container py-4"><div class="d-flex justify-content-between align-items-center mb-3"><h1 class="h3 mb-0">Users</h1><div><a asp-page="./Create" class="btn btn-primary">Create user</a></div></div>
+@if (!string.IsNullOrWhiteSpace(Model.Notice)) { <div class="alert alert-info" role="alert">@Model.Notice</div> }
+@if (Model.Messages.Count > 0) { <div class="alert alert-danger"><ul class="mb-0">@foreach(var message in Model.Messages){<li>@message</li>}</ul></div> }
 
-
-<div class="container py-4">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h1 class="h3 mb-0">Users / @Model.Action</h1>
-        <div>
-            @if (Model.Action == "List")
-            {
-                <a asp-page="./Index" asp-route-action="Create" class="btn btn-primary">Create user</a>
-            }
-            else
-            {
-                <a asp-page="./Index" class="btn btn-outline-secondary">Back to list</a>
-            }
-        </div>
-    </div>
-
-    @if (!string.IsNullOrWhiteSpace(Model.Notice))
-    {
-        <div class="alert alert-info" role="alert">@Model.Notice</div>
-    }
-    @if (Model.Messages.Count > 0)
-    {
-        <div class="alert alert-danger" role="alert">
-            <ul class="mb-0">
-                @foreach (var message in Model.Messages)
-                {
-                    <li>@message</li>
-                }
-            </ul>
-        </div>
-    }
-
-    @if (Model.Action == "List")
-    {
         <div class="table-responsive">
             <table class="table table-striped table-hover align-middle">
                 <thead>
@@ -51,9 +18,9 @@
                             <td>@(user.Status == 1 ? "Active" : "Inactive")</td>
                             <td>@(user.Role == 1 ? "Administrator" : user.Role == 2 ? "Manager" : "User")</td>
                             <td class="text-nowrap">
-                                <a asp-page="./Index" asp-route-action="Details" asp-route-id="@user.Id" class="btn btn-sm btn-outline-secondary">Details</a>
-                                <a asp-page="./Index" asp-route-action="Edit" asp-route-id="@user.Id" class="btn btn-sm btn-outline-primary">Edit</a>
-                                <a asp-page="./Index" asp-route-action="Delete" asp-route-id="@user.Id" class="btn btn-sm btn-outline-danger">Delete</a>
+                                <a asp-page="./Details" asp-route-id="@user.Id" class="btn btn-sm btn-outline-secondary">Details</a>
+                                <a asp-page="./Edit" asp-route-id="@user.Id" class="btn btn-sm btn-outline-primary">Edit</a>
+                                <a asp-page="./Delete" asp-route-id="@user.Id" class="btn btn-sm btn-outline-danger">Delete</a>
                             </td>
                         </tr>
                     }
@@ -64,53 +31,4 @@
         {
             <p class="text-muted">No users found.</p>
         }
-    }
-    else if (Model.Action == "Details" && Model.SelectedUser is not null)
-    {
-        <dl class="row">
-            <dt class="col-sm-3">Username</dt><dd class="col-sm-9">@Model.SelectedUser.Username</dd>
-            <dt class="col-sm-3">Status</dt><dd class="col-sm-9">@(Model.SelectedUser.Status == 1 ? "Active" : "Inactive")</dd>
-            <dt class="col-sm-3">Role</dt><dd class="col-sm-9">@(Model.SelectedUser.Role == 1 ? "Administrator" : Model.SelectedUser.Role == 2 ? "Manager" : "User")</dd>
-        </dl>
-    }
-    else if (Model.Action == "Delete" && Model.SelectedUser is not null)
-    {
-        <p>Delete user <strong>@Model.SelectedUser.Username</strong>? This action cannot be undone.</p>
-        <form method="post" asp-page-handler="Delete" asp-route-id="@Model.SelectedUser.Id">
-            <button type="submit" class="btn btn-danger">Confirm delete</button>
-            <a asp-page="./Index" class="btn btn-outline-secondary">Cancel</a>
-        </form>
-    }
-    else if (Model.Action == "Create" || Model.Action == "Edit")
-    {
-        <form method="post" asp-page-handler="@(Model.Action == "Create" ? "Create" : "Edit")">
-            <input type="hidden" asp-for="Input.Id" />
-            <div class="mb-3">
-                <label asp-for="Input.Username" class="form-label">Username</label>
-                <input asp-for="Input.Username" class="form-control" required />
-            </div>
-            <div class="mb-3">
-                <label asp-for="Input.Password" class="form-label">Password</label>
-                <input asp-for="Input.Password" type="password" class="form-control" autocomplete="new-password" required="@(Model.Action == "Create")" />
-                @if (Model.Action == "Edit")
-                {
-                    <div class="form-text">Leave blank to keep the current password.</div>
-                }
-            </div>
-            <div class="mb-3">
-                <label asp-for="Input.Status" class="form-label">Status</label>
-                <select asp-for="Input.Status" class="form-select">
-                    <option value="0">Inactive</option><option value="1">Active</option>
-                </select>
-            </div>
-            <div class="mb-3">
-                <label asp-for="Input.Role" class="form-label">Role</label>
-                <select asp-for="Input.Role" class="form-select">
-                    <option value="0">User</option><option value="1">Administrator</option><option value="2">Manager</option>
-                </select>
-            </div>
-            <button type="submit" class="btn btn-primary">Save</button>
-            <a asp-page="./Index" class="btn btn-outline-secondary">Cancel</a>
-        </form>
-    }
 </div>
