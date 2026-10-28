@@ -104,6 +104,7 @@ public class LoginModel : PageModel
 
     public async Task<IActionResult> OnPostAsync(CancellationToken cancellationToken)
     {
+        if (User.Identity?.IsAuthenticated == true) return RedirectToPage("./Index");
         var expectedCaptcha = TempData[nameof(LoginCaptchaCode)] as string;
         GenerateCaptcha(); // One-time challenge; regenerate on every failed login.
         if (string.IsNullOrEmpty(expectedCaptcha) || !string.Equals(CaptchaInput.Trim(), expectedCaptcha, StringComparison.Ordinal))

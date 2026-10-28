@@ -1,2 +1,8 @@
 @page
 @model Application.Pages.Account.LogoutModel
+@{ ViewData["Title"] = "Logout"; }
+<div class="container py-4" style="max-width:760px;">
+    <h1 class="h3 mb-3">Logout</h1>
+    <p>Do you want to log out?</p>
+    <form method="post"><button type="submit" class="btn btn-danger">Logout</button> <a asp-page="./Index" class="btn btn-outline-secondary">Cancel</a></form>
+</div>
