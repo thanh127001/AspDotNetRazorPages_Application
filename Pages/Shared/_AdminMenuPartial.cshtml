@@ -22,6 +22,12 @@
             </a>
         </li>
         <li class="nav-item">
+            <a class="nav-link @(currentPage == "/Content/Index" ? "active" : "")"
+               asp-page="/Content/Index" aria-current="@(currentPage == "/Content/Index" ? "page" : null)">
+                <i class="bi bi-file-earmark-text me-1"></i>Contents
+            </a>
+        </li>
+        <li class="nav-item">
             <a class="nav-link @(currentPage == "/File/Index" ? "active" : "")"
                asp-page="/File/Index" aria-current="@(currentPage == "/File/Index" ? "page" : null)">
                 <i class="bi bi-folder me-1"></i>Files
