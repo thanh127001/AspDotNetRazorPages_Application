@@ -10,8 +10,21 @@ namespace Application.Pages.Content;
 public class IndexModel : PageModel
 {
     private readonly IAppCoreService _core;
+    private readonly IAppRuntimeService _runtime;
 
-    public IndexModel(IAppCoreService core) => _core = core;
+    public IndexModel(IAppCoreService core, IAppRuntimeService runtime)
+    {
+        _core = core;
+        _runtime = runtime;
+    }
+
+    private async Task RefreshContentCacheAsync(CancellationToken cancellationToken)
+    {
+        var contents = await _core.GetContentsAsync(cancellationToken);
+        if (!contents.Success || contents.Data is null)
+            throw new InvalidOperationException("Unable to refresh content cache: " + string.Join(" ", contents.Messages));
+        _runtime.SetContents(contents.Data);
+    }
 
     public List<AppContentModel> Contents { get; private set; } = new();
     public AppContentModel? SelectedContent { get; private set; }
@@ -67,6 +80,7 @@ public class IndexModel : PageModel
             Messages = result.Messages;
             return Page();
         }
+        await RefreshContentCacheAsync(cancellationToken);
         Notice = string.Join(" ", result.Messages);
         return RedirectToPage();
     }
@@ -80,6 +94,7 @@ public class IndexModel : PageModel
             Messages = result.Messages;
             return Page();
         }
+        await RefreshContentCacheAsync(cancellationToken);
         Notice = string.Join(" ", result.Messages);
         return RedirectToPage();
     }
@@ -87,6 +102,7 @@ public class IndexModel : PageModel
     public async Task<IActionResult> OnPostDeleteAsync(string id, CancellationToken cancellationToken)
     {
         var result = await _core.DeleteContentAsync(id, cancellationToken);
+        await RefreshContentCacheAsync(cancellationToken);
         Notice = string.Join(" ", result.Messages);
         return RedirectToPage();
     }
