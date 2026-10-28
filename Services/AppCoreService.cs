@@ -567,12 +567,10 @@ public sealed class AppCoreService : IAppCoreService
         {
             if (input is null)
                 return AppResultModel<string>.Fail("Content data is required.");
-            input.Code = input.Code?.Trim() ?? string.Empty;
+            input.Code = string.IsNullOrWhiteSpace(input.Code) ? null : input.Code.Trim();
             input.Title = input.Title?.Trim() ?? string.Empty;
             var errors = new List<string>();
-            if (string.IsNullOrWhiteSpace(input.Code))
-                errors.Add("Content code is required.");
-            else if (await _db.AppContents.AnyAsync(x => x.Code == input.Code, cancellationToken))
+            if (input.Code is not null && (await _db.AppContents.AnyAsync(x => x.Code == input.Code, cancellationToken))
                 errors.Add("Content code already exists.");
             if (string.IsNullOrWhiteSpace(input.Title))
                 errors.Add("Content title is required.");
@@ -613,12 +611,10 @@ public sealed class AppCoreService : IAppCoreService
                 return AppResultModel<bool>.Fail("Content data is required.");
             if (string.IsNullOrWhiteSpace(input.Id))
                 return AppResultModel<bool>.Fail("Content ID is required.");
-            input.Code = input.Code?.Trim() ?? string.Empty;
+            input.Code = string.IsNullOrWhiteSpace(input.Code) ? null : input.Code.Trim();
             input.Title = input.Title?.Trim() ?? string.Empty;
             var errors = new List<string>();
-            if (string.IsNullOrWhiteSpace(input.Code))
-                errors.Add("Content code is required.");
-            else if (await _db.AppContents.AnyAsync(x => x.Code == input.Code && x.Id != input.Id, cancellationToken))
+            if (input.Code is not null && (await _db.AppContents.AnyAsync(x => x.Code == input.Code && x.Id != input.Id, cancellationToken))
                 errors.Add("Content code already exists.");
             if (string.IsNullOrWhiteSpace(input.Title))
                 errors.Add("Content title is required.");
