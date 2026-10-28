@@ -9,18 +9,14 @@ SQLitePCL.Batteries_V2.Init();
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Storage defaults to a folder under the content root during development.
-// In production, set Storage__RootPath to an absolute directory outside the publish folder.
-var configuredStorageRoot = builder.Configuration["Storage:RootPath"];
-if (string.IsNullOrWhiteSpace(configuredStorageRoot))
-    throw new InvalidOperationException("Storage:RootPath must be configured.");
-var storageRoot = Path.GetFullPath(Path.IsPathRooted(configuredStorageRoot)
-    ? configuredStorageRoot
-    : Path.Combine(builder.Environment.ContentRootPath, configuredStorageRoot));
-var appDataDirectory = Path.Combine(storageRoot, "AppData");
-var logsDirectory = Path.Combine(storageRoot, "Logs");
+// Fixed directories relative to the application's content root.
+var root = builder.Environment.ContentRootPath;
+var appDataDirectory = Path.Combine(root, "AppData");
+var logsDirectory = Path.Combine(root, "Logs");
+var filesDirectory = Path.Combine(builder.Environment.WebRootPath ?? Path.Combine(root, "wwwroot"), "files");
 Directory.CreateDirectory(appDataDirectory);
 Directory.CreateDirectory(logsDirectory);
+Directory.CreateDirectory(filesDirectory);
 AppDatabaseService.ConfigureDatabasePath(Path.Combine(appDataDirectory, "Application.db"));
 
 builder.Host.UseSerilog((context, services, logger) => logger
