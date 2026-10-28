@@ -570,7 +570,7 @@ public sealed class AppCoreService : IAppCoreService
             input.Code = string.IsNullOrWhiteSpace(input.Code) ? null : input.Code.Trim();
             input.Title = input.Title?.Trim() ?? string.Empty;
             var errors = new List<string>();
-            if (input.Code is not null && (await _db.AppContents.AnyAsync(x => x.Code == input.Code, cancellationToken))
+            if (input.Code is not null && await _db.AppContents.AnyAsync(x => x.Code == input.Code, cancellationToken))
                 errors.Add("Content code already exists.");
             if (string.IsNullOrWhiteSpace(input.Title))
                 errors.Add("Content title is required.");
@@ -614,7 +614,7 @@ public sealed class AppCoreService : IAppCoreService
             input.Code = string.IsNullOrWhiteSpace(input.Code) ? null : input.Code.Trim();
             input.Title = input.Title?.Trim() ?? string.Empty;
             var errors = new List<string>();
-            if (input.Code is not null && (await _db.AppContents.AnyAsync(x => x.Code == input.Code && x.Id != input.Id, cancellationToken))
+            if (input.Code is not null && await _db.AppContents.AnyAsync(x => x.Code == input.Code && x.Id != input.Id, cancellationToken))
                 errors.Add("Content code already exists.");
             if (string.IsNullOrWhiteSpace(input.Title))
                 errors.Add("Content title is required.");
