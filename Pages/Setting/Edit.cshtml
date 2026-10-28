@@ -1,0 +1,29 @@
+@page "{id?}"
+@model Application.Pages.Setting.EditModel
+@{ ViewData["Title"] = "Edit Setting"; }
+<div class="container py-4"><div class="d-flex justify-content-between align-items-center mb-3"><h1 class="h3">Edit Setting</h1><a asp-page="./Index" class="btn btn-outline-secondary">Back to list</a></div>
+@if (!string.IsNullOrWhiteSpace(Model.Notice)) { <div class="alert alert-info">@Model.Notice</div> }
+@if (Model.Messages.Count > 0) { <div class="alert alert-danger"><ul class="mb-0">@foreach(var message in Model.Messages){<li>@message</li>}</ul></div> }
+
+        <form method="post" >
+            <input type="hidden" asp-for="Input.Id" />
+            <div class="mb-3">
+                    <label class="form-label">Code</label>
+                    <input class="form-control" value="@Model.Input.Code" readonly />
+            </div>
+            <div class="mb-3">
+                <label asp-for="Input.Name" class="form-label">Name</label>
+                <input asp-for="Input.Name" class="form-control" required />
+            </div>
+            <div class="mb-3">
+                <label asp-for="Input.Value" class="form-label">Value</label>
+                <textarea asp-for="Input.Value" class="form-control" rows="5"></textarea>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Input.Order" class="form-label">Order</label>
+                <input asp-for="Input.Order" type="number" class="form-control" />
+            </div>
+            <button type="submit" class="btn btn-primary">Save</button>
+            <a asp-page="./Index" class="btn btn-outline-secondary">Cancel</a>
+        </form>
+</div>

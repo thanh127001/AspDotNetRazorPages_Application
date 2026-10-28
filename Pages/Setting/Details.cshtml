@@ -1,0 +1,13 @@
+@page "{id?}"
+@model Application.Pages.Setting.DetailsModel
+@{ ViewData["Title"] = "Setting Details"; }
+<div class="container py-4"><div class="d-flex justify-content-between align-items-center mb-3"><h1 class="h3">Setting Details</h1><div><a asp-page="./Edit" asp-route-id="@Model.SelectedSetting?.Id" class="btn btn-outline-primary">Edit</a> <a asp-page="./Index" class="btn btn-outline-secondary">Back to list</a></div></div>
+@if(Model.SelectedSetting is not null) {
+        <dl class="row">
+            <dt class="col-sm-3">Code</dt><dd class="col-sm-9">@Model.SelectedSetting.Code</dd>
+            <dt class="col-sm-3">Name</dt><dd class="col-sm-9">@Model.SelectedSetting.Name</dd>
+            <dt class="col-sm-3">Value</dt><dd class="col-sm-9 text-break" style="white-space: pre-wrap">@Model.SelectedSetting.Value</dd>
+            <dt class="col-sm-3">Order</dt><dd class="col-sm-9">@Model.SelectedSetting.Order</dd>
+        </dl>
+}
+</div>
