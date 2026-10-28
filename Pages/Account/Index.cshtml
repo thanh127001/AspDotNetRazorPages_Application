@@ -1,6 +1,6 @@
 @page
 @model Application.Pages.Account.IndexModel
 @{ ViewData["Title"] = "Account"; }
-<div class="container py-4" style="max-width:760px;"><div class="d-flex justify-content-between align-items-center mb-3"><h1 class="h3">Account</h1><div class="d-flex gap-2"><a asp-page="./ChangPassword" class="btn btn-outline-primary">Change password</a><form method="post" asp-page="./Logout"><button type="submit" class="btn btn-outline-danger">Logout</button></form></div></div>
+<div class="container py-4" style="max-width:760px;"><div class="d-flex justify-content-between align-items-center mb-3"><h1 class="h3">Account</h1><div class="d-flex gap-2"><a asp-page="./ChangPassword" class="btn btn-outline-primary">Change password</a><a asp-page="./Logout" class="btn btn-outline-danger">Logout</a></div></div>
 @if(Model.CurrentUser is not null){<dl class="row"><dt class="col-sm-4">Username</dt><dd class="col-sm-8">@Model.CurrentUser.Username</dd><dt class="col-sm-4">Status</dt><dd class="col-sm-8">@(Model.CurrentUser.Status == 1 ? "Active" : "Inactive")</dd><dt class="col-sm-4">Role</dt><dd class="col-sm-8">@(Model.CurrentUser.Role == 1 ? "Administrator" : Model.CurrentUser.Role == 2 ? "Manager" : "User")</dd></dl>}
 </div>
