@@ -46,18 +46,17 @@ public class IndexModel : PageModel
     [BindProperty]
     public string CaptchaInput { get; set; } = string.Empty;
 
-    private void GenerateCaptcha() => LoginCaptchaCode = RandomNumberGenerator.GetInt32(0, 1000000).ToString("D6");
+    public string CaptchaImageBase64 { get; private set; } = string.Empty;
 
-    public IActionResult OnGetCaptcha()
+    private void GenerateCaptcha()
     {
-        var code = TempData.Peek(nameof(LoginCaptchaCode)) as string;
-        if (string.IsNullOrEmpty(code)) return NotFound();
-
-        var random = RandomNumberGenerator.GetInt32(1000, 9999);
-        var svg = $""" 
+        var code = RandomNumberGenerator.GetInt32(0, 1000000).ToString("D6");
+        LoginCaptchaCode = code;
+        var seed = RandomNumberGenerator.GetInt32(1000, 9999);
+        var svg = $"""
             <svg xmlns="http://www.w3.org/2000/svg" width="220" height="70" viewBox="0 0 220 70">
               <defs>
-                <filter id="distort"><feTurbulence type="fractalNoise" baseFrequency="0.025" numOctaves="2" seed="{random}" result="noise"/><feDisplacementMap in="SourceGraphic" in2="noise" scale="7"/></filter>
+                <filter id="distort"><feTurbulence type="fractalNoise" baseFrequency="0.025" numOctaves="2" seed="{seed}" result="noise"/><feDisplacementMap in="SourceGraphic" in2="noise" scale="7"/></filter>
               </defs>
               <rect width="220" height="70" fill="#e5e7eb"/>
               <path d="M0 18 Q55 68 110 22 T220 47 M0 51 Q80 0 150 55 T220 14" fill="none" stroke="#9ca3af" stroke-width="2"/>
@@ -65,9 +64,7 @@ public class IndexModel : PageModel
               <path d="M0 39 Q70 8 140 46 T220 30" fill="none" stroke="#6b7280" stroke-width="1.5"/>
             </svg>
             """;
-        Response.Headers.CacheControl = "no-store, no-cache, must-revalidate";
-        Response.Headers.Pragma = "no-cache";
-        return Content(svg, "image/svg+xml", Encoding.UTF8);
+        CaptchaImageBase64 = "data:image/svg+xml;base64," + Convert.ToBase64String(Encoding.UTF8.GetBytes(svg));
     }
 
     public sealed class LoginInput
