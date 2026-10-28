@@ -1,0 +1,121 @@
+@page
+@model Application.Pages.Content.IndexModel
+@{
+    ViewData["Title"] = "Content Management";
+}
+
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1 class="h3 mb-0">Contents / @Model.Action</h1>
+        @if (Model.Action == "List")
+        {
+            <a asp-page="./Index" asp-route-action="Create" class="btn btn-primary">Create content</a>
+        }
+        else
+        {
+            <a asp-page="./Index" class="btn btn-outline-secondary">Back to list</a>
+        }
+    </div>
+
+    @if (!string.IsNullOrWhiteSpace(Model.Notice))
+    {
+        <div class="alert alert-info" role="alert">@Model.Notice</div>
+    }
+    @if (Model.Messages.Count > 0)
+    {
+        <div class="alert alert-danger" role="alert">
+            <ul class="mb-0">
+                @foreach (var message in Model.Messages)
+                {
+                    <li>@message</li>
+                }
+            </ul>
+        </div>
+    }
+
+    @if (Model.Action == "List")
+    {
+        <div class="table-responsive">
+            <table class="table table-striped table-hover align-middle">
+                <thead>
+                    <tr><th>Code</th><th>Title</th><th>Status</th><th>Order</th><th>Actions</th></tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Contents)
+                    {
+                        <tr>
+                            <td>@item.Code</td>
+                            <td>@item.Title</td>
+                            <td>@(item.Status == 1 ? "Active" : "Inactive")</td>
+                            <td>@item.Order</td>
+                            <td class="text-nowrap">
+                                <a asp-page="./Index" asp-route-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-secondary">Details</a>
+                                <a asp-page="./Index" asp-route-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary">Edit</a>
+                                <a asp-page="./Index" asp-route-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-outline-danger">Delete</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        @if (Model.Contents.Count == 0 && Model.Messages.Count == 0)
+        {
+            <p class="text-muted">No contents found.</p>
+        }
+    }
+    else if (Model.Action == "Details" && Model.SelectedContent is not null)
+    {
+        <dl class="row">
+            <dt class="col-sm-3">Code</dt><dd class="col-sm-9">@Model.SelectedContent.Code</dd>
+            <dt class="col-sm-3">Title</dt><dd class="col-sm-9">@Model.SelectedContent.Title</dd>
+            <dt class="col-sm-3">Icon</dt><dd class="col-sm-9">@Model.SelectedContent.Icon</dd>
+            <dt class="col-sm-3">Order</dt><dd class="col-sm-9">@Model.SelectedContent.Order</dd>
+            <dt class="col-sm-3">Status</dt><dd class="col-sm-9">@(Model.SelectedContent.Status == 1 ? "Active" : "Inactive")</dd>
+            <dt class="col-sm-3">Created</dt><dd class="col-sm-9">@Model.SelectedContent.CreatedTime.ToString("yyyy-MM-dd HH:mm:ss") UTC</dd>
+            <dt class="col-sm-3">Updated</dt><dd class="col-sm-9">@(Model.SelectedContent.UpdatedTime?.ToString("yyyy-MM-dd HH:mm:ss") ?? "—")</dd>
+            <dt class="col-sm-3">Content</dt><dd class="col-sm-9"><div class="border rounded p-3 text-break" style="white-space: pre-wrap;">@Model.SelectedContent.Content</div></dd>
+        </dl>
+    }
+    else if (Model.Action == "Delete" && Model.SelectedContent is not null)
+    {
+        <p>Delete content <strong>@Model.SelectedContent.Title</strong>? This action cannot be undone.</p>
+        <form method="post" asp-page-handler="Delete" asp-route-id="@Model.SelectedContent.Id">
+            <button type="submit" class="btn btn-danger">Confirm delete</button>
+            <a asp-page="./Index" class="btn btn-outline-secondary">Cancel</a>
+        </form>
+    }
+    else if (Model.Action == "Create" || Model.Action == "Edit")
+    {
+        <form method="post" asp-page-handler="@(Model.Action == "Create" ? "Create" : "Edit")">
+            <input type="hidden" asp-for="Input.Id" />
+            <div class="mb-3">
+                <label asp-for="Input.Code" class="form-label">Code</label>
+                <input asp-for="Input.Code" class="form-control" required />
+            </div>
+            <div class="mb-3">
+                <label asp-for="Input.Title" class="form-label">Title</label>
+                <input asp-for="Input.Title" class="form-control" required />
+            </div>
+            <div class="mb-3">
+                <label asp-for="Input.Content" class="form-label">Content</label>
+                <textarea asp-for="Input.Content" class="form-control" rows="10"></textarea>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Input.Icon" class="form-label">Icon</label>
+                <input asp-for="Input.Icon" class="form-control" />
+            </div>
+            <div class="mb-3">
+                <label asp-for="Input.Order" class="form-label">Order</label>
+                <input asp-for="Input.Order" type="number" class="form-control" />
+            </div>
+            <div class="mb-3">
+                <label asp-for="Input.Status" class="form-label">Status</label>
+                <select asp-for="Input.Status" class="form-select">
+                    <option value="0">Inactive</option><option value="1">Active</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Save</button>
+            <a asp-page="./Index" class="btn btn-outline-secondary">Cancel</a>
+        </form>
+    }
+</div>
