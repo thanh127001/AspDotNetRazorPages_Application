@@ -27,25 +27,9 @@
     <nav class="navbar navbar-expand-lg bg-body border-bottom fixed-top shadow-sm">
         <div class="container">
 
-            @if (User.Identity?.IsAuthenticated == true && User.IsInRole("1"))
-            {
-                <div class="dropdown">
-                    <button class="navbar-brand btn btn-link text-decoration-none dropdown-toggle" id="app-navbar-brand"
-                            type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        @appName
-                    </button>
-                    <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" asp-page="/Index">Home</a></li>
-                        <li><a class="dropdown-item" asp-page="/Administration">Administration</a></li>
-                    </ul>
-                </div>
-            }
-            else
-            {
-                <a class="navbar-brand" id="app-navbar-brand" asp-page="/Index" asp-route-id="">
-                    @appName
-                </a>
-            }
+            <a class="navbar-brand" id="app-navbar-brand" asp-page="/Index" asp-route-id="">
+                @appName
+            </a>
 
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
                 <span class="navbar-toggler-icon"></span>
