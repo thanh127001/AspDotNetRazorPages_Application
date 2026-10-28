@@ -127,9 +127,9 @@ public sealed class AppDataInitiationService : IAppDataInitiationService
         var initialContents = existing.Count == 0
             ? defaults.Concat(new[]
             {
-                new AppContentModel { Code = "sample-content-1", Title = "Sample Content 1", Content = "<p>Sample content 1.</p>", Status = 1, Order = 4 },
-                new AppContentModel { Code = "sample-content-2", Title = "Sample Content 2", Content = "<p>Sample content 2.</p>", Status = 1, Order = 5 },
-                new AppContentModel { Code = "sample-content-3", Title = "Sample Content 3", Content = "<p>Sample content 3.</p>", Status = 1, Order = 6 }
+                new AppContentModel { Code = "sample-content-1", Title = "Sample Content 1", Icon = "bi bi-file-earmark-text", Content = "<p>Sample content 1.</p>", Status = 1, Order = 4 },
+                new AppContentModel { Code = "sample-content-2", Title = "Sample Content 2", Icon = "bi bi-file-earmark-text", Content = "<p>Sample content 2.</p>", Status = 1, Order = 5 },
+                new AppContentModel { Code = "sample-content-3", Title = "Sample Content 3", Icon = "bi bi-file-earmark-text", Content = "<p>Sample content 3.</p>", Status = 1, Order = 6 }
             })
             : defaults.AsEnumerable();
 
