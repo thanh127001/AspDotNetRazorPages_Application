@@ -3,10 +3,10 @@
     var appName = Runtime.GetSettingValue("app-name");
     var appDescription = Runtime.GetSettingValue("app-description");
     var appCopyright = Runtime.GetSettingValue("app-copyright");
-    var currentPage = ViewContext.RouteData.Values["page"]?.ToString() ?? "";
-    var adminFolders = new[] { "/Setting", "/User", "/File" };
-    var showAdminMenu = currentPage.Equals("/Administration", StringComparison.OrdinalIgnoreCase)
-        || adminFolders.Any(folder => currentPage.StartsWith(folder + "/", StringComparison.OrdinalIgnoreCase));
+    var currentPage = (ViewContext.RouteData.Values["page"]?.ToString() ?? "").TrimStart('/');
+    var adminPages = new[] { "Administration", "User", "Setting", "File" };
+    var showAdminMenu = adminPages.Any(page =>
+        currentPage.StartsWith(page, StringComparison.OrdinalIgnoreCase));
 }
 
 <!DOCTYPE html>
