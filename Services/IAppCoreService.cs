@@ -15,6 +15,12 @@ public interface IAppCoreService
     Task<AppResultModel<string>> CreateSettingAsync(AppSettingModel input, CancellationToken cancellationToken = default);
     Task<AppResultModel<bool>> UpdateSettingAsync(AppSettingModel input, CancellationToken cancellationToken = default);
 
+    Task<AppResultModel<List<AppContentModel>>> GetContentsAsync(CancellationToken cancellationToken = default);
+    Task<AppResultModel<AppContentModel>> GetContentAsync(string id, CancellationToken cancellationToken = default);
+    Task<AppResultModel<string>> CreateContentAsync(AppContentModel input, CancellationToken cancellationToken = default);
+    Task<AppResultModel<bool>> UpdateContentAsync(AppContentModel input, CancellationToken cancellationToken = default);
+    Task<AppResultModel<bool>> DeleteContentAsync(string id, CancellationToken cancellationToken = default);
+
     Task<AppResultModel<List<AppUserModel>>> GetUsersAsync(CancellationToken cancellationToken = default);
     Task<AppResultModel<AppUserModel>> GetUserAsync(string id, CancellationToken cancellationToken = default);
     Task<AppResultModel<string>> CreateUserAsync(AppUserModel input, CancellationToken cancellationToken = default);
