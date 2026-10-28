@@ -53,6 +53,17 @@
                 <label asp-for="Login.Password" class="form-label">Password</label>
                 <input asp-for="Login.Password" type="password" class="form-control" autocomplete="current-password" required />
             </div>
+            <div class="mb-3">
+                <label asp-for="CaptchaInput" class="form-label">Verification code</label>
+                <div class="mb-2">
+                    <img src="@Url.Page("./Index", "Captcha", new { v = Guid.NewGuid().ToString("N") })"
+                         alt="Six-digit verification code" width="220" height="70"
+                         class="border rounded" draggable="false" />
+                </div>
+                <input asp-for="CaptchaInput" class="form-control" inputmode="numeric"
+                       pattern="[0-9]{6}" maxlength="6" autocomplete="off"
+                       placeholder="Enter the 6 digits shown above" required />
+            </div>
             <button type="submit" class="btn btn-primary">Login</button>
         </form>
     }
