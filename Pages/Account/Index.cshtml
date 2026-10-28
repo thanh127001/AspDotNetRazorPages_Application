@@ -56,7 +56,7 @@
             <div class="mb-3">
                 <label asp-for="CaptchaInput" class="form-label">Verification code</label>
                 <div class="mb-2">
-                    <img src="@Url.Page("./Index", "Captcha", new { v = Guid.NewGuid().ToString("N") })"
+                    <img src="@Model.CaptchaImageBase64"
                          alt="Six-digit verification code" width="220" height="70"
                          class="border rounded" draggable="false" />
                 </div>
