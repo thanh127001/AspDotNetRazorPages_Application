@@ -1,3 +1,5 @@
+using System.Security.Cryptography;
+using System.Text;
 using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
 using Application.Data;
@@ -38,6 +40,36 @@ public class IndexModel : PageModel
     [TempData]
     public string? Notice { get; set; }
 
+    [TempData]
+    public string? LoginCaptchaCode { get; set; }
+
+    [BindProperty]
+    public string CaptchaInput { get; set; } = string.Empty;
+
+    private void GenerateCaptcha() => LoginCaptchaCode = RandomNumberGenerator.GetInt32(0, 1000000).ToString("D6");
+
+    public IActionResult OnGetCaptcha()
+    {
+        var code = TempData.Peek(nameof(LoginCaptchaCode)) as string;
+        if (string.IsNullOrEmpty(code)) return NotFound();
+
+        var random = RandomNumberGenerator.GetInt32(1000, 9999);
+        var svg = $""" 
+            <svg xmlns="http://www.w3.org/2000/svg" width="220" height="70" viewBox="0 0 220 70">
+              <defs>
+                <filter id="distort"><feTurbulence type="fractalNoise" baseFrequency="0.025" numOctaves="2" seed="{random}" result="noise"/><feDisplacementMap in="SourceGraphic" in2="noise" scale="7"/></filter>
+              </defs>
+              <rect width="220" height="70" fill="#e5e7eb"/>
+              <path d="M0 18 Q55 68 110 22 T220 47 M0 51 Q80 0 150 55 T220 14" fill="none" stroke="#9ca3af" stroke-width="2"/>
+              <text x="19" y="49" font-family="monospace" font-size="39" font-weight="bold" letter-spacing="5" fill="#374151" filter="url(#distort)">{code}</text>
+              <path d="M0 39 Q70 8 140 46 T220 30" fill="none" stroke="#6b7280" stroke-width="1.5"/>
+            </svg>
+            """;
+        Response.Headers.CacheControl = "no-store, no-cache, must-revalidate";
+        Response.Headers.Pragma = "no-cache";
+        return Content(svg, "image/svg+xml", Encoding.UTF8);
+    }
+
     public sealed class LoginInput
     {
         [Required]
@@ -65,6 +97,7 @@ public class IndexModel : PageModel
         if (User.Identity?.IsAuthenticated != true)
         {
             Mode = "Login";
+            GenerateCaptcha();
             return Page();
         }
 
@@ -92,6 +125,14 @@ public class IndexModel : PageModel
     public async Task<IActionResult> OnPostLoginAsync(CancellationToken cancellationToken)
     {
         Mode = "Login";
+        var expectedCaptcha = TempData[nameof(LoginCaptchaCode)] as string;
+        GenerateCaptcha(); // One-time challenge; regenerate on every failed login.
+        if (string.IsNullOrEmpty(expectedCaptcha) || !string.Equals(CaptchaInput.Trim(), expectedCaptcha, StringComparison.Ordinal))
+        {
+            Messages.Add("Invalid verification code. Please try the new code.");
+            return Page();
+        }
+
         if (string.IsNullOrWhiteSpace(Login.Username) || string.IsNullOrEmpty(Login.Password))
         {
             Messages.Add("Username and password are required.");
