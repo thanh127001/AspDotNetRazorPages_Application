@@ -1,15 +1,21 @@
-using Application.Data;
+using Application.Models;
+using Application.Services;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.EntityFrameworkCore;
 
 namespace Application.Pages;
 
 public class IndexModel : PageModel
 {
-    private readonly AppDbContext _db;
-    public IndexModel(AppDbContext db) => _db = db;
+    private readonly IAppCoreService _core;
+    private readonly IAppRuntimeService _runtime;
 
-    public AppContent? Content { get; private set; }
+    public IndexModel(IAppCoreService core, IAppRuntimeService runtime)
+    {
+        _core = core;
+        _runtime = runtime;
+    }
+
+    public AppContentModel? Content { get; private set; }
     public string ContentCode { get; private set; } = "home";
 
     public async Task OnGetAsync(CancellationToken cancellationToken)
@@ -20,7 +26,12 @@ public class IndexModel : PageModel
             "/about" => "about",
             _ => "home"
         };
-        Content = await _db.AppContents.AsNoTracking()
-            .FirstOrDefaultAsync(x => x.Code == ContentCode && x.Status == 1, cancellationToken);
+
+        var id = _runtime.GetContentId(ContentCode);
+        if (string.IsNullOrEmpty(id)) return;
+
+        var result = await _core.GetContentAsync(id, cancellationToken);
+        if (result.Success && result.Data?.Status == 1)
+            Content = result.Data;
     }
 }
