@@ -44,6 +44,7 @@
     @if (Model.Mode == "Login")
     {
         <form method="post" asp-page-handler="Login">
+            <input type="hidden" asp-for="ReturnUrl" />
             <div class="mb-3">
                 <label asp-for="Login.Username" class="form-label">Username</label>
                 <input asp-for="Login.Username" class="form-control" autocomplete="username" required />
