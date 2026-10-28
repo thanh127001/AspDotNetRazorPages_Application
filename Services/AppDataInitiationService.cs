@@ -29,6 +29,10 @@ public sealed class AppDataInitiationService : IAppDataInitiationService
         await InitializeAdministratorAsync(administratorPassword, cancellationToken);
         await InitializeSettingsAsync(cancellationToken);
         await InitializeContentsAsync(cancellationToken);
+        var contents = await _core.GetContentsAsync(cancellationToken);
+        if (!contents.Success || contents.Data is null)
+            throw new InvalidOperationException(string.Join(" ", contents.Messages));
+        _runtime.SetContents(contents.Data);
         var settings = await _core.GetSettingsAsync(cancellationToken);
         if (!settings.Success || settings.Data is null)
             throw new InvalidOperationException(string.Join(" ", settings.Messages));
