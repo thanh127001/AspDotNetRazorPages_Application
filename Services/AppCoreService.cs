@@ -510,4 +510,152 @@ public sealed class AppCoreService : IAppCoreService
             return AppResultModel<bool>.Fail($"An error occurred while processing the request. Error ID: {errorId}");
         }
     }
+    private static AppContentModel ToModel(AppContent entity) => new()
+    {
+        Id = entity.Id,
+        Code = entity.Code,
+        Title = entity.Title,
+        Content = entity.Content,
+        Icon = entity.Icon,
+        Order = entity.Order,
+        Active = entity.Active
+    };
+
+    public async Task<AppResultModel<List<AppContentModel>>> GetContentsAsync(CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var entities = await _db.AppContents.AsNoTracking()
+                .OrderBy(x => x.Order).ThenBy(x => x.Title)
+                .ToListAsync(cancellationToken);
+            return AppResultModel<List<AppContentModel>>.Ok(entities.Select(ToModel).ToList());
+        }
+        catch (Exception ex) when (ex is not OperationCanceledException || !cancellationToken.IsCancellationRequested)
+        {
+            var errorId = AppErrorLog.Log(_logger, ex, nameof(GetContentsAsync));
+            return AppResultModel<List<AppContentModel>>.Fail($"An error occurred while processing the request. Error ID: {errorId}");
+        }
+    }
+
+    public async Task<AppResultModel<AppContentModel>> GetContentAsync(string id, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            if (string.IsNullOrWhiteSpace(id))
+                return AppResultModel<AppContentModel>.Fail("Content ID is required.");
+            var entity = await _db.AppContents.AsNoTracking()
+                .FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
+            return entity is null
+                ? AppResultModel<AppContentModel>.Fail("Content not found.")
+                : AppResultModel<AppContentModel>.Ok(ToModel(entity));
+        }
+        catch (Exception ex) when (ex is not OperationCanceledException || !cancellationToken.IsCancellationRequested)
+        {
+            var errorId = AppErrorLog.Log(_logger, ex, nameof(GetContentAsync));
+            return AppResultModel<AppContentModel>.Fail($"An error occurred while processing the request. Error ID: {errorId}");
+        }
+    }
+
+    public async Task<AppResultModel<string>> CreateContentAsync(AppContentModel input, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            if (input is null)
+                return AppResultModel<string>.Fail("Content data is required.");
+            input.Code = input.Code?.Trim() ?? string.Empty;
+            input.Title = input.Title?.Trim() ?? string.Empty;
+            var errors = new List<string>();
+            if (string.IsNullOrWhiteSpace(input.Code))
+                errors.Add("Content code is required.");
+            else if (await _db.AppContents.AnyAsync(x => x.Code == input.Code, cancellationToken))
+                errors.Add("Content code already exists.");
+            if (string.IsNullOrWhiteSpace(input.Title))
+                errors.Add("Content title is required.");
+            if (input.Content is null)
+                errors.Add("Content body is required.");
+            if (errors.Count > 0)
+                return AppResultModel<string>.Fail(errors.ToArray());
+
+            var entity = new AppContent
+            {
+                Id = AppIdGenerator.GenerateId(),
+                Code = input.Code,
+                Title = input.Title,
+                Content = input.Content,
+                Icon = input.Icon,
+                Order = input.Order,
+                Active = input.Active
+            };
+            _db.AppContents.Add(entity);
+            await _db.SaveChangesAsync(cancellationToken);
+            return AppResultModel<string>.Ok(entity.Id, "Content created successfully.");
+        }
+        catch (Exception ex) when (ex is not OperationCanceledException || !cancellationToken.IsCancellationRequested)
+        {
+            var errorId = AppErrorLog.Log(_logger, ex, nameof(CreateContentAsync));
+            return AppResultModel<string>.Fail($"An error occurred while processing the request. Error ID: {errorId}");
+        }
+    }
+
+    public async Task<AppResultModel<bool>> UpdateContentAsync(AppContentModel input, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            if (input is null)
+                return AppResultModel<bool>.Fail("Content data is required.");
+            if (string.IsNullOrWhiteSpace(input.Id))
+                return AppResultModel<bool>.Fail("Content ID is required.");
+            input.Code = input.Code?.Trim() ?? string.Empty;
+            input.Title = input.Title?.Trim() ?? string.Empty;
+            var errors = new List<string>();
+            if (string.IsNullOrWhiteSpace(input.Code))
+                errors.Add("Content code is required.");
+            else if (await _db.AppContents.AnyAsync(x => x.Code == input.Code && x.Id != input.Id, cancellationToken))
+                errors.Add("Content code already exists.");
+            if (string.IsNullOrWhiteSpace(input.Title))
+                errors.Add("Content title is required.");
+            if (input.Content is null)
+                errors.Add("Content body is required.");
+            if (errors.Count > 0)
+                return AppResultModel<bool>.Fail(errors.ToArray());
+
+            var entity = await _db.AppContents.FindAsync(new object[] { input.Id }, cancellationToken);
+            if (entity is null)
+                return AppResultModel<bool>.Fail("Content not found.");
+            entity.Code = input.Code;
+            entity.Title = input.Title;
+            entity.Content = input.Content;
+            entity.Icon = input.Icon;
+            entity.Order = input.Order;
+            entity.Active = input.Active;
+            await _db.SaveChangesAsync(cancellationToken);
+            return AppResultModel<bool>.Ok(true, "Content updated successfully.");
+        }
+        catch (Exception ex) when (ex is not OperationCanceledException || !cancellationToken.IsCancellationRequested)
+        {
+            var errorId = AppErrorLog.Log(_logger, ex, nameof(UpdateContentAsync));
+            return AppResultModel<bool>.Fail($"An error occurred while processing the request. Error ID: {errorId}");
+        }
+    }
+
+    public async Task<AppResultModel<bool>> DeleteContentAsync(string id, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            if (string.IsNullOrWhiteSpace(id))
+                return AppResultModel<bool>.Fail("Content ID is required.");
+            var entity = await _db.AppContents.FindAsync(new object[] { id }, cancellationToken);
+            if (entity is null)
+                return AppResultModel<bool>.Fail("Content not found.");
+            _db.AppContents.Remove(entity);
+            await _db.SaveChangesAsync(cancellationToken);
+            return AppResultModel<bool>.Ok(true, "Content deleted successfully.");
+        }
+        catch (Exception ex) when (ex is not OperationCanceledException || !cancellationToken.IsCancellationRequested)
+        {
+            var errorId = AppErrorLog.Log(_logger, ex, nameof(DeleteContentAsync));
+            return AppResultModel<bool>.Fail($"An error occurred while processing the request. Error ID: {errorId}");
+        }
+    }
+
 }
