@@ -14,4 +14,6 @@ public interface IAppRuntimeService
     void SetSettings(IEnumerable<AppSettingModel> settings);
     string GetSettingValue(string? code);
     void SetSettingValue(string? code, string? value);
+    void SetContents(IEnumerable<AppContentModel> contents);
+    string GetContentId(string? code);
 }
