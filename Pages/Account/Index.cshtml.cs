@@ -26,6 +26,9 @@ public class IndexModel : PageModel
     public string Mode { get; private set; } = "Index";
     public List<string> Messages { get; private set; } = new();
 
+    [BindProperty(SupportsGet = true)]
+    public string? ReturnUrl { get; set; }
+
     [BindProperty]
     public LoginInput Login { get; set; } = new();
 
@@ -117,7 +120,9 @@ public class IndexModel : PageModel
             CookieAuthenticationDefaults.AuthenticationScheme,
             new ClaimsPrincipal(identity));
 
-        return RedirectToPage();
+        return !string.IsNullOrWhiteSpace(ReturnUrl) && Url.IsLocalUrl(ReturnUrl)
+            ? LocalRedirect(ReturnUrl)
+            : RedirectToPage();
     }
 
     public async Task<IActionResult> OnPostLogoutAsync()
