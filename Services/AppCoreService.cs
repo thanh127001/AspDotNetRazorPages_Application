@@ -184,7 +184,9 @@ public sealed class AppCoreService : IAppCoreService
         Id = entity.Id,
         Username = entity.Username,
         Status = entity.Status,
-        Role = entity.Role
+        Role = entity.Role,
+        CreatedTime = entity.CreatedTime,
+        UpdatedTime = entity.UpdatedTime
     };
 
     public async Task<AppResultModel<List<AppSettingModel>>> GetSettingsAsync(CancellationToken cancellationToken = default)
@@ -392,7 +394,7 @@ public sealed class AppCoreService : IAppCoreService
             {
                 return AppResultModel<string>.Fail(errors.ToArray());
             }
-            var entity = new AppUser { Id = AppIdGenerator.GenerateId(), Username = input.Username, Password = input.Password, Status = input.Status, Role = input.Role };
+            var entity = new AppUser { Id = AppIdGenerator.GenerateId(), Username = input.Username, Password = input.Password, Status = input.Status, Role = input.Role, CreatedTime = DateTime.UtcNow };
             _db.AppUsers.Add(entity);
             await _db.SaveChangesAsync(cancellationToken);
             return AppResultModel<string>.Ok(entity.Id, "User created successfully.");
@@ -469,6 +471,7 @@ public sealed class AppCoreService : IAppCoreService
             entity.Username = input.Username;
             entity.Status = input.Status;
             entity.Role = input.Role;
+            entity.UpdatedTime = DateTime.UtcNow;
             if (!string.IsNullOrWhiteSpace(input.Password))
             {
                 entity.Password = input.Password;
@@ -518,7 +521,9 @@ public sealed class AppCoreService : IAppCoreService
         Content = entity.Content,
         Icon = entity.Icon,
         Order = entity.Order,
-        Status = entity.Status
+        Status = entity.Status,
+        CreatedTime = entity.CreatedTime,
+        UpdatedTime = entity.UpdatedTime
     };
 
     public async Task<AppResultModel<List<AppContentModel>>> GetContentsAsync(CancellationToken cancellationToken = default)
@@ -586,7 +591,8 @@ public sealed class AppCoreService : IAppCoreService
                 Content = input.Content,
                 Icon = input.Icon,
                 Order = input.Order,
-                Status = input.Status
+                Status = input.Status,
+                CreatedTime = DateTime.UtcNow
             };
             _db.AppContents.Add(entity);
             await _db.SaveChangesAsync(cancellationToken);
@@ -632,6 +638,7 @@ public sealed class AppCoreService : IAppCoreService
             entity.Icon = input.Icon;
             entity.Order = input.Order;
             entity.Status = input.Status;
+            entity.UpdatedTime = DateTime.UtcNow;
             await _db.SaveChangesAsync(cancellationToken);
             return AppResultModel<bool>.Ok(true, "Content updated successfully.");
         }
