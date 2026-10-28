@@ -15,7 +15,7 @@ builder.Host.UseSerilog((context, services, logger) => logger
     .Enrich.FromLogContext()
     .WriteTo.Console()
     .WriteTo.File(
-        Path.Combine(context.HostingEnvironment.ContentRootPath, "Logs", "log-.txt"),
+        Path.Combine(AppContext.BaseDirectory, "Logs", "log-.txt"),
         rollingInterval: RollingInterval.Day,
         retainedFileCountLimit: 30,
         shared: true));
