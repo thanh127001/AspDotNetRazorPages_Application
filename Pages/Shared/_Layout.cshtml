@@ -3,6 +3,7 @@
     var appName = Runtime.GetSettingValue("app-name");
     var appDescription = Runtime.GetSettingValue("app-description");
     var appCopyright = Runtime.GetSettingValue("app-copyright");
+    var customPages = Runtime.GetNavigationContents();
     var currentPage = (ViewContext.RouteData.Values["page"]?.ToString() ?? "").TrimStart('/');
     var adminPages = new[] { "Administration", "User", "Setting", "File", "Content" };
     var showAdminMenu = adminPages.Any(page =>
@@ -47,9 +48,12 @@
                 </ul>
                 @* custom pages *@
                 <ul class="navbar-nav">
-                    <li class="nav-item">
-                        <a class="nav-link text-dark" asp-page="/Index" asp-route-code=""><i class="bi bi-house me-1"></i>Custom page</a>
-                    </li>
+                    @foreach (var content in customPages)
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-page="/Index" asp-route-code="@content.Code">@content.Title</a>
+                        </li>
+                    }
                 </ul>
                 <div class="border-top border-secondary opacity-25 my-2 d-lg-none"></div>
 
