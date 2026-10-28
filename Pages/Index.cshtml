@@ -1,12 +1,20 @@
 @page
 @model Application.Pages.IndexModel
 @{
+    var isHome = string.Equals(Model.ContentCode, "home", StringComparison.OrdinalIgnoreCase);
     ViewData["Title"] = Model.Content?.Title ?? Model.ContentCode;
 }
 @if (Model.Content is not null)
 {
-    <h1>@Model.Content.Title</h1>
+    @if (!isHome)
+    {
+        <h1>@Model.Content.Title</h1>
+    }
     <div>@Html.Raw(Model.Content.Content)</div>
+}
+else if (isHome)
+{
+    <p>Welcome to Application!</p>
 }
 else
 {
