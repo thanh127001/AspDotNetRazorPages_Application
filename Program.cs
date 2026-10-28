@@ -25,7 +25,7 @@ builder.Services.AddRazorPages(options =>
     options.Conventions.AllowAnonymousToPage("/Index");
     options.Conventions.AllowAnonymousToPage("/Error");
     options.Conventions.AllowAnonymousToPage("/Initiation");
-    options.Conventions.AllowAnonymousToPage("/Account/Index");
+    options.Conventions.AllowAnonymousToPage("/Account/Login");
     options.Conventions.AuthorizePage("/User/Index", "AdministratorOnly");
     options.Conventions.AuthorizePage("/Content/Index", "AdministratorOnly");
     options.Conventions.AuthorizePage("/Setting/Index", "AdministratorOnly");
@@ -39,8 +39,8 @@ builder.Services.AddAuthorization(options =>
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
-        options.LoginPath = "/Account/Index";
-        options.AccessDeniedPath = "/Account/Index";
+        options.LoginPath = "/Account/Login";
+        options.AccessDeniedPath = "/Account/Login";
         options.Cookie.HttpOnly = true;
         options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
         options.Cookie.SameSite = SameSiteMode.Lax;
