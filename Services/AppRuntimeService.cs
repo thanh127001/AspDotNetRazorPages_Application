@@ -8,6 +8,7 @@ public sealed class AppRuntimeService : IAppRuntimeService
     private Dictionary<string, string> _settings = new(StringComparer.OrdinalIgnoreCase);
     private bool _settingsLoaded;
     private Dictionary<string, string> _contentIds = new(StringComparer.OrdinalIgnoreCase);
+    private List<AppContentModel> _navigationContents = new();
     private string? _accessCode;
     private bool _isInitialized;
     private int _failedInitiationAttempts;
@@ -92,7 +93,19 @@ public sealed class AppRuntimeService : IAppRuntimeService
             if (!string.IsNullOrWhiteSpace(content.Code) && !string.IsNullOrWhiteSpace(content.Id))
                 snapshot[content.Code.Trim()] = content.Id;
         }
-        lock (_sync) _contentIds = snapshot;
+        var navigation = contents
+            .Where(x => !string.IsNullOrWhiteSpace(x.Code) && x.Status == 1 &&
+                !new[] { "home", "privacy", "about" }.Contains(x.Code.Trim(), StringComparer.OrdinalIgnoreCase))
+            .OrderBy(x => x.Order)
+            .ThenBy(x => x.Title)
+            .Select(x => new AppContentModel { Id = x.Id, Code = x.Code.Trim(), Title = x.Title, Icon = x.Icon, Order = x.Order, Status = x.Status })
+            .ToList();
+        lock (_sync) { _contentIds = snapshot; _navigationContents = navigation; }
+    }
+
+    public IReadOnlyList<AppContentModel> GetNavigationContents()
+    {
+        lock (_sync) return _navigationContents.ToList();
     }
 
     public string GetContentId(string? code)
