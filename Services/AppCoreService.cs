@@ -518,7 +518,7 @@ public sealed class AppCoreService : IAppCoreService
         Content = entity.Content,
         Icon = entity.Icon,
         Order = entity.Order,
-        Active = entity.Active
+        Status = entity.Status
     };
 
     public async Task<AppResultModel<List<AppContentModel>>> GetContentsAsync(CancellationToken cancellationToken = default)
@@ -573,6 +573,8 @@ public sealed class AppCoreService : IAppCoreService
                 errors.Add("Content title is required.");
             if (input.Content is null)
                 errors.Add("Content body is required.");
+            if (input.Status is not (0 or 1))
+                errors.Add("Status must be 0 (Inactive) or 1 (Active).");
             if (errors.Count > 0)
                 return AppResultModel<string>.Fail(errors.ToArray());
 
@@ -584,7 +586,7 @@ public sealed class AppCoreService : IAppCoreService
                 Content = input.Content,
                 Icon = input.Icon,
                 Order = input.Order,
-                Active = input.Active
+                Status = input.Status
             };
             _db.AppContents.Add(entity);
             await _db.SaveChangesAsync(cancellationToken);
@@ -616,6 +618,8 @@ public sealed class AppCoreService : IAppCoreService
                 errors.Add("Content title is required.");
             if (input.Content is null)
                 errors.Add("Content body is required.");
+            if (input.Status is not (0 or 1))
+                errors.Add("Status must be 0 (Inactive) or 1 (Active).");
             if (errors.Count > 0)
                 return AppResultModel<bool>.Fail(errors.ToArray());
 
@@ -627,7 +631,7 @@ public sealed class AppCoreService : IAppCoreService
             entity.Content = input.Content;
             entity.Icon = input.Icon;
             entity.Order = input.Order;
-            entity.Active = input.Active;
+            entity.Status = input.Status;
             await _db.SaveChangesAsync(cancellationToken);
             return AppResultModel<bool>.Ok(true, "Content updated successfully.");
         }
