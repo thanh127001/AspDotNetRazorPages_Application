@@ -31,7 +31,7 @@
     <nav class="navbar navbar-expand-lg bg-body border-bottom fixed-top shadow-sm">
         <div class="container">
 
-            <a class="navbar-brand" id="app-navbar-brand" asp-page="/Index" asp-route-id="">
+            <a class="navbar-brand" id="app-navbar-brand" asp-page="/Index">
                 @appName
             </a>
 
@@ -42,17 +42,17 @@
             <div class="collapse navbar-collapse" id="navbarContent">
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item">
-                        <a class="nav-link text-dark" asp-area="" asp-page="/Index"><i class="bi bi-house me-1"></i>Home</a>
+                        <a class="nav-link text-dark" asp-page="/Index"><i class="bi bi-house me-1"></i>Home</a>
                     </li>
                 </ul>
                 <div class="border-top border-secondary opacity-25 my-2 d-lg-none"></div>
 
                 <ul class="navbar-nav">
                     <li class="nav-item">
-                        <a class="nav-link text-dark" href="/Privacy"><i class="bi bi-shield-lock me-1"></i>Privacy</a>
+                        <a class="nav-link text-dark" asp-page="/Index" asp-route-code="Privacy"><i class="bi bi-shield-lock me-1"></i>Privacy</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link text-dark" href="/About"><i class="bi bi-info-circle me-1"></i>About</a>
+                        <a class="nav-link text-dark" asp-page="/Index" asp-route-code="About"><i class="bi bi-info-circle me-1"></i>About</a>
                     </li>
                     @if (User.Identity?.IsAuthenticated == true && User.IsInRole("1"))
                     {
