@@ -1,0 +1,31 @@
+@{
+    var currentPage = ViewContext.RouteData.Values["page"]?.ToString();
+}
+<nav aria-label="Administration navigation" class="mb-4">
+    <ul class="nav nav-tabs flex-wrap">
+        <li class="nav-item">
+            <a class="nav-link @(currentPage == "/Administration" ? "active" : "")"
+               asp-page="/Administration" aria-current="@(currentPage == "/Administration" ? "page" : null)">
+                <i class="bi bi-speedometer2 me-1"></i>Overview
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link @(currentPage == "/Setting/Index" ? "active" : "")"
+               asp-page="/Setting/Index" aria-current="@(currentPage == "/Setting/Index" ? "page" : null)">
+                <i class="bi bi-gear me-1"></i>Settings
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link @(currentPage == "/User/Index" ? "active" : "")"
+               asp-page="/User/Index" aria-current="@(currentPage == "/User/Index" ? "page" : null)">
+                <i class="bi bi-people me-1"></i>Users
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link @(currentPage == "/File/Index" ? "active" : "")"
+               asp-page="/File/Index" aria-current="@(currentPage == "/File/Index" ? "page" : null)">
+                <i class="bi bi-folder me-1"></i>Files
+            </a>
+        </li>
+    </ul>
+</nav>
