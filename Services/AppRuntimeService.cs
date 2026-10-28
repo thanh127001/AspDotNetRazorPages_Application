@@ -7,6 +7,7 @@ public sealed class AppRuntimeService : IAppRuntimeService
     private readonly object _sync = new();
     private Dictionary<string, string> _settings = new(StringComparer.OrdinalIgnoreCase);
     private bool _settingsLoaded;
+    private Dictionary<string, string> _contentIds = new(StringComparer.OrdinalIgnoreCase);
     private string? _accessCode;
     private bool _isInitialized;
     private int _failedInitiationAttempts;
@@ -82,4 +83,22 @@ public sealed class AppRuntimeService : IAppRuntimeService
         }
     }
 
+    public void SetContents(IEnumerable<AppContentModel> contents)
+    {
+        ArgumentNullException.ThrowIfNull(contents);
+        var snapshot = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        foreach (var content in contents)
+        {
+            if (!string.IsNullOrWhiteSpace(content.Code) && !string.IsNullOrWhiteSpace(content.Id))
+                snapshot[content.Code.Trim()] = content.Id;
+        }
+        lock (_sync) _contentIds = snapshot;
+    }
+
+    public string GetContentId(string? code)
+    {
+        if (string.IsNullOrWhiteSpace(code)) return string.Empty;
+        lock (_sync)
+            return _contentIds.TryGetValue(code.Trim(), out var id) ? id : string.Empty;
+    }
 }
