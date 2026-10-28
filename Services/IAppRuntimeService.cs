@@ -16,4 +16,5 @@ public interface IAppRuntimeService
     void SetSettingValue(string? code, string? value);
     void SetContents(IEnumerable<AppContentModel> contents);
     string GetContentId(string? code);
+    IReadOnlyList<AppContentModel> GetNavigationContents();
 }
