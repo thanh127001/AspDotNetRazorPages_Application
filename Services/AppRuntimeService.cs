@@ -87,20 +87,31 @@ public sealed class AppRuntimeService : IAppRuntimeService
     public void SetContents(IEnumerable<AppContentModel> contents)
     {
         ArgumentNullException.ThrowIfNull(contents);
-        var snapshot = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-        foreach (var content in contents)
-        {
-            if (!string.IsNullOrWhiteSpace(content.Code) && !string.IsNullOrWhiteSpace(content.Id))
-                snapshot[content.Code.Trim()] = content.Id;
-        }
-        var navigation = contents
-            .Where(x => !string.IsNullOrWhiteSpace(x.Code) && x.Status == 1 &&
-                !new[] { "home", "privacy", "about" }.Contains(x.Code.Trim(), StringComparer.OrdinalIgnoreCase))
+        var ordered = contents
+            .Where(x => !string.IsNullOrWhiteSpace(x.Code) && !string.IsNullOrWhiteSpace(x.Id))
             .OrderBy(x => x.Order)
             .ThenBy(x => x.Title)
-            .Select(x => new AppContentModel { Id = x.Id, Code = x.Code.Trim(), Title = x.Title, Icon = x.Icon, Order = x.Order, Status = x.Status })
             .ToList();
-        lock (_sync) { _contentIds = snapshot; _navigationContents = navigation; }
+
+        var ids = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        foreach (var content in ordered)
+            ids[content.Code!.Trim()] = content.Id;
+
+        var navigation = ordered
+            .Where(x => x.Status == 1 &&
+                !new[] { "home", "privacy", "about" }.Contains(x.Code!.Trim(), StringComparer.OrdinalIgnoreCase))
+            .Select(x => new AppContentModel
+            {
+                Id = x.Id, Code = x.Code!.Trim(), Title = x.Title,
+                Icon = x.Icon, Order = x.Order, Status = x.Status
+            })
+            .ToList();
+
+        lock (_sync)
+        {
+            _contentIds = ids;
+            _navigationContents = navigation;
+        }
     }
 
     public IReadOnlyList<AppContentModel> GetNavigationContents()
