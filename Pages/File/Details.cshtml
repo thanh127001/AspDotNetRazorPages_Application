@@ -1,0 +1,43 @@
+@page "{id?}"
+@model Application.Pages.File.DetailsModel
+@{
+    ViewData["Title"] = "Details File";
+}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1 class="h3 mb-0">Details File</h1>
+        <a asp-page="./Index" class="btn btn-outline-secondary">Back to list</a>
+    </div>
+    @if (!string.IsNullOrWhiteSpace(Model.Notice))
+    {
+        <div class="alert alert-info">@Model.Notice</div>
+    }
+    @if (Model.SelectedFile is not null)
+    {
+        <dl class="row">
+            <dt class="col-sm-3">File name</dt><dd class="col-sm-9 text-break">@Model.SelectedFile.FileName</dd>
+            <dt class="col-sm-3">Type</dt><dd class="col-sm-9">@Model.SelectedFile.FileType</dd>
+            <dt class="col-sm-3">Size</dt><dd class="col-sm-9">@Model.SelectedFile.FileSize.ToString("N0") bytes</dd>
+            <dt class="col-sm-3">Order</dt><dd class="col-sm-9">@Model.SelectedFile.Order</dd>
+        </dl>
+        <div class="d-flex gap-2">
+            <button type="button" class="btn btn-outline-success" data-file-path="@Application.Services.AppFileCacheService.GetUrl(Model.SelectedFile.Id, Model.SelectedFile.FileName)" onclick="copyFilePath(this)">Copy Path</button>
+            <a asp-page="./Index" asp-page-handler="Download" asp-route-id="@Model.SelectedFile.Id" class="btn btn-outline-secondary">Download</a>
+            <a asp-page="./Edit" asp-route-id="@Model.SelectedFile.Id" class="btn btn-outline-primary">Edit</a>
+        </div>
+    }
+
+</div>
+<script>
+    async function copyFilePath(button) {
+        const path = button.dataset.filePath;
+        try {
+            await navigator.clipboard.writeText(path);
+            const original = button.textContent;
+            button.textContent = 'Copied!';
+            setTimeout(() => button.textContent = original, 1500);
+        } catch {
+            window.prompt('Copy file path:', path);
+        }
+    }
+</script>

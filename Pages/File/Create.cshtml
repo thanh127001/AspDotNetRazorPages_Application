@@ -1,0 +1,37 @@
+@page
+@model Application.Pages.File.CreateModel
+@{
+    ViewData["Title"] = "Create File";
+}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1 class="h3 mb-0">Create File</h1>
+        <a asp-page="./Index" class="btn btn-outline-secondary">Back to list</a>
+    </div>
+    @if (!string.IsNullOrWhiteSpace(Model.Notice))
+    {
+        <div class="alert alert-info">@Model.Notice</div>
+    }
+    @if (Model.Messages.Count > 0)
+    {
+        <div class="alert alert-danger">
+            @foreach (var message in Model.Messages)
+            {
+                <div>@message</div>
+            }
+        </div>
+    }
+    <form method="post" enctype="multipart/form-data">
+        <div class="mb-3">
+            <label asp-for="Upload" class="form-label">Upload file (PNG, JPG, TXT, PDF; maximum 1 MB)</label>
+            <input asp-for="Upload" type="file" class="form-control" accept=".png,.jpg,.jpeg,.txt,.pdf" required />
+        </div>
+        <div class="mb-3">
+            <label asp-for="Order" class="form-label">Order</label>
+            <input asp-for="Order" type="number" class="form-control" />
+        </div>
+        <button type="submit" class="btn btn-primary">Upload</button>
+        <a asp-page="./Index" class="btn btn-outline-secondary">Cancel</a>
+    </form>
+
+</div>
