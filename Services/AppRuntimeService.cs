@@ -98,8 +98,7 @@ public sealed class AppRuntimeService : IAppRuntimeService
             ids[content.Code!.Trim()] = content.Id;
 
         var navigation = ordered
-            .Where(x => x.Status == 1 &&
-                !new[] { "home", "privacy", "about" }.Contains(x.Code!.Trim(), StringComparer.OrdinalIgnoreCase))
+            .Where(x => x.Status == 1)
             .Select(x => new AppContentModel
             {
                 Id = x.Id, Code = x.Code!.Trim(), Title = x.Title,
