@@ -25,9 +25,6 @@ builder.Services.AddRazorPages(options =>
     options.Conventions.AllowAnonymousToPage("/Index");
     options.Conventions.AllowAnonymousToPage("/Error");
     options.Conventions.AllowAnonymousToPage("/Initiation");
-    options.Conventions.AddPageRoute("/Index", "/Home");
-    options.Conventions.AddPageRoute("/Index", "/Privacy");
-    options.Conventions.AddPageRoute("/Index", "/About");
     options.Conventions.AllowAnonymousToPage("/Account/Index");
     options.Conventions.AuthorizePage("/User/Index", "AdministratorOnly");
     options.Conventions.AuthorizePage("/Content/Index", "AdministratorOnly");
