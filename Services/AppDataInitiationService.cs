@@ -28,6 +28,7 @@ public sealed class AppDataInitiationService : IAppDataInitiationService
 
         await InitializeAdministratorAsync(administratorPassword, cancellationToken);
         await InitializeSettingsAsync(cancellationToken);
+        await InitializeContentsAsync(cancellationToken);
         var settings = await _core.GetSettingsAsync(cancellationToken);
         if (!settings.Success || settings.Data is null)
             throw new InvalidOperationException(string.Join(" ", settings.Messages));
@@ -105,4 +106,27 @@ public sealed class AppDataInitiationService : IAppDataInitiationService
             }
         }
     }
+    private async Task InitializeContentsAsync(CancellationToken cancellationToken)
+    {
+        var result = await _core.GetContentsAsync(cancellationToken);
+        if (!result.Success)
+            throw new InvalidOperationException(string.Join(" ", result.Messages));
+
+        var defaults = new[]
+        {
+            new AppContentModel { Code = "home", Title = "Home", Content = "<p>Welcome to our website.</p>", Status = 1, Order = 1 },
+            new AppContentModel { Code = "privacy", Title = "Privacy", Content = "<p>Privacy policy content.</p>", Status = 1, Order = 2 },
+            new AppContentModel { Code = "about", Title = "About", Content = "<p>About this website.</p>", Status = 1, Order = 3 }
+        };
+
+        foreach (var item in defaults)
+        {
+            if (result.Data?.Any(x => string.Equals(x.Code, item.Code, StringComparison.OrdinalIgnoreCase)) == true)
+                continue;
+            var created = await _core.CreateContentAsync(item, cancellationToken);
+            if (!created.Success)
+                throw new InvalidOperationException(string.Join(" ", created.Messages));
+        }
+    }
+
 }
