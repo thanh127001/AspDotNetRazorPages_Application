@@ -42,28 +42,16 @@
 
             <div class="collapse navbar-collapse" id="navbarContent">
                 <ul class="navbar-nav">
-                    <li class="nav-item">
-                        <a class="nav-link text-dark" asp-page="/Index" asp-route-code=""><i class="bi bi-house me-1"></i>Home</a>
-                    </li>
-                </ul>
-                @* custom pages *@
-                <ul class="navbar-nav">
                     @foreach (var content in customPages)
                     {
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-page="/Index" asp-route-code="@content.Code"><i class="@(string.IsNullOrWhiteSpace(content.Icon) ? "bi bi-file-earmark-text" : content.Icon) me-1"></i>@content.Title</a>
+                            <a class="nav-link text-dark" asp-page="/Index" asp-route-code="@(string.Equals(content.Code, "home", StringComparison.OrdinalIgnoreCase) ? null : content.Code)"><i class="@(string.IsNullOrWhiteSpace(content.Icon) ? "bi bi-file-earmark-text" : content.Icon) me-1"></i>@content.Title</a>
                         </li>
                     }
                 </ul>
                 <div class="border-top border-secondary opacity-25 my-2 d-lg-none"></div>
 
                 <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link text-dark" asp-page="/Index" asp-route-code="Privacy"><i class="bi bi-shield-lock me-1"></i>Privacy</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-dark" asp-page="/Index" asp-route-code="About"><i class="bi bi-info-circle me-1"></i>About</a>
-                    </li>
                     @if (User.Identity?.IsAuthenticated == true && User.IsInRole("1"))
                     {
                         <li class="nav-item">
