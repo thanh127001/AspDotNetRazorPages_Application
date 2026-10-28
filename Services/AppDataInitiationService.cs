@@ -123,9 +123,19 @@ public sealed class AppDataInitiationService : IAppDataInitiationService
             new AppContentModel { Code = "about", Title = "About", Content = "<p>About this website.</p>", Status = 1, Order = 3 }
         };
 
-        foreach (var item in defaults)
+        var existing = result.Data ?? new List<AppContentModel>();
+        var initialContents = existing.Count == 0
+            ? defaults.Concat(new[]
+            {
+                new AppContentModel { Code = "sample-content-1", Title = "Sample Content 1", Content = "<p>Sample content 1.</p>", Status = 1, Order = 4 },
+                new AppContentModel { Code = "sample-content-2", Title = "Sample Content 2", Content = "<p>Sample content 2.</p>", Status = 1, Order = 5 },
+                new AppContentModel { Code = "sample-content-3", Title = "Sample Content 3", Content = "<p>Sample content 3.</p>", Status = 1, Order = 6 }
+            })
+            : defaults.AsEnumerable();
+
+        foreach (var item in initialContents)
         {
-            if (result.Data?.Any(x => string.Equals(x.Code, item.Code, StringComparison.OrdinalIgnoreCase)) == true)
+            if (existing.Any(x => string.Equals(x.Code, item.Code, StringComparison.OrdinalIgnoreCase)))
                 continue;
             var created = await _core.CreateContentAsync(item, cancellationToken);
             if (!created.Success)
