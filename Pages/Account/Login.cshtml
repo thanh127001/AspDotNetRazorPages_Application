@@ -1,0 +1,61 @@
+@page
+@model Application.Pages.Account.LoginModel
+@{ ViewData["Title"] = "Login"; }
+<div class="container py-4" style="max-width:760px;">
+<h1 class="h3 mb-3">Login</h1>
+@if (!string.IsNullOrWhiteSpace(Model.Notice)) { <div class="alert alert-info">@Model.Notice</div> }
+@if (Model.Messages.Count > 0) { <div class="alert alert-danger"><ul>@foreach(var message in Model.Messages){<li>@message</li>}</ul></div> }
+
+        <form method="post" >
+            <input type="hidden" asp-for="ReturnUrl" />
+            <div class="mb-3">
+                <label asp-for="Login.Username" class="form-label">Username</label>
+                <input asp-for="Login.Username" class="form-control" autocomplete="username" required />
+            </div>
+            <div class="mb-3">
+                <label asp-for="Login.Password" class="form-label">Password</label>
+                <input asp-for="Login.Password" type="password" class="form-control" autocomplete="current-password" required />
+            </div>
+            <div class="mb-3">
+                <label asp-for="CaptchaInput" class="form-label">Verification code</label>
+                <div class="d-flex align-items-center gap-2 mb-2">
+                    <img id="captcha-image" src="@Model.CaptchaImageBase64"
+                         alt="Six-digit verification code" width="220" height="70"
+                         class="border rounded" draggable="false" />
+                    <button type="button" id="refresh-captcha" class="btn btn-outline-secondary"
+                            title="Refresh verification code" aria-label="Refresh verification code">
+                        <i class="bi bi-arrow-clockwise"></i>
+                    </button>
+                </div>
+                <input asp-for="CaptchaInput" class="form-control" inputmode="numeric"
+                       pattern="[0-9]{6}" maxlength="6" autocomplete="off"
+                       placeholder="Enter the 6 digits shown above" required />
+            </div>
+            <button type="submit" class="btn btn-primary">Login</button>
+        </form>
+</div>
+@section Scripts {
+    <script>
+        document.getElementById('refresh-captcha')?.addEventListener('click', async function () {
+            const button = this;
+            button.disabled = true;
+            try {
+                const token = document.querySelector('form[method="post"] input[name="__RequestVerificationToken"]')?.value;
+                const response = await fetch('@Url.Page("./Login", "RefreshCaptcha")', {
+                    method: 'POST',
+                    headers: { 'RequestVerificationToken': token ?? '' },
+                    credentials: 'same-origin',
+                    cache: 'no-store'
+                });
+                if (!response.ok) throw new Error('Failed to refresh CAPTCHA');
+                const data = await response.json();
+                document.getElementById('captcha-image').src = data.image;
+                document.getElementById('CaptchaInput').value = '';
+            } catch {
+                alert('Unable to refresh the verification code. Please reload the page.');
+            } finally {
+                button.disabled = false;
+            }
+        });
+    </script>
+}
