@@ -1,0 +1,60 @@
+@page
+@model Application.Pages.StaticContentModel
+@{
+        Model.SetTitle("PDF Editor");
+}
+
+@section Toolbar {
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#fullscreenModal">
+                Open Fullscreen Modal
+        </button>
+}
+
+<!-- Fullscreen Modal -->
+<div class="modal fade"
+     id="fullscreenModal"
+     tabindex="-1"
+     aria-label="Fullscreen Modal"
+     aria-hidden="true">
+
+    <div class="modal-dialog modal-fullscreen">
+        <div class="modal-content">
+            <div class="modal-body p-0 position-relative overflow-hidden">
+
+                <!-- Close Button -->
+                <button type="button"
+                        class="btn-close position-absolute top-0 end-0 m-3 z-3"
+                        data-bs-dismiss="modal"
+                        aria-label="Close">
+                </button>
+
+                <!-- Iframe -->
+                <iframe id="contentFrame"
+                        data-src="@Url.Page("/StaticContent", "Content")"
+                        class="w-100 h-100 border-0 d-block"
+                        title="PDF Editor">
+                </iframe>
+
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    (() => {
+        const modal = document.getElementById('fullscreenModal');
+        const iframe = document.getElementById('contentFrame');
+
+        // Load iframe when opening the modal
+        modal.addEventListener('show.bs.modal', () => {
+            iframe.src = iframe.dataset.src;
+        });
+
+        // Unload iframe when the modal is closed
+        modal.addEventListener('hidden.bs.modal', () => {
+            iframe.removeAttribute('src');
+        });
+    })();
+</script>
+

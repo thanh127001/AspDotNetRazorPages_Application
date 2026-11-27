@@ -1,0 +1,256 @@
+﻿@using System.Globalization
+@using Microsoft.Extensions.Options
+@inject Application.Services.IAppCoreService core
+
+@{
+    var pageTitle = (ViewData["Title"] as string)?.Trim();
+    var appName = Localizer["App.Name"];
+}
+
+@inject IOptions<RequestLocalizationOptions> LocalizationOptions
+
+@{
+    var currentCulture = CultureInfo.CurrentUICulture;
+    var supportedCultures = LocalizationOptions.Value.SupportedUICultures;
+
+
+    var returnUrl = Context.Request.PathBase.ToString()
+        + Context.Request.Path.ToString()
+        + Context.Request.QueryString.ToString();
+}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>@(string.IsNullOrWhiteSpace(pageTitle) ? appName : $"{pageTitle} - {appName}")</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/lib/bootstrap-icons/bootstrap-icons.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flag-icons/css/flag-icons.min.css">
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+
+    <style>
+            html {
+                opacity: 0;
+                visibility: hidden;
+            }
+
+            html.page-ready {
+                opacity: 1;
+                visibility: visible;
+            }
+    </style>
+    <script>
+            window.addEventListener("load", () => {
+                setTimeout(() => {
+                    document.documentElement.classList.add("page-ready");
+                }, 200);
+            }, { once: true });
+    </script>
+</head>
+
+<body class="vh-100 d-flex flex-column">
+
+    <!-- Header -->
+    <header class="flex-shrink-0 bg-body border-bottom">
+        <nav class="navbar navbar-expand-lg">
+            <div class="container">
+
+                <a class="navbar-brand" asp-page="/Index" asp-route-code="">
+                    @appName
+                </a>
+
+                <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#mainNavigation"
+                        aria-controls="mainNavigation" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <div class="offcanvas offcanvas-start" tabindex="-1" id="mainNavigation"
+                     aria-labelledby="navigationTitle">
+
+                    <div class="offcanvas-header">
+                        <h5 class="offcanvas-title" id="navigationTitle">
+                            @appName
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close">
+                        </button>
+                    </div>
+
+                    <div class="offcanvas-body">
+
+                        <ul class="navbar-nav me-auto">
+                            <li class="nav-item">
+                                <a class="nav-link" asp-page="/Index" asp-route-code="">
+                                    <i class="bi bi-house me-1"></i>
+                                    <span>@Localizer["Title.Home"]</span>
+                                </a>
+                            </li>
+                        </ul>
+
+                        <ul class="navbar-nav">
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                                   aria-expanded="false">
+                                    <i class="bi bi-info-circle me-1"></i>
+                                    <span>@Localizer["Title.Information"]</span>
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end">
+                                    <li>
+                                        <a class="dropdown-item" href="/About">
+                                            <i class="bi bi-info-circle me-1"></i>
+                                            <span>@Localizer["Title.About"]</span>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="/Contact">
+                                            <i class="bi bi-envelope me-1"></i>
+                                            <span>@Localizer["Title.Contact"]</span>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <hr class="dropdown-divider">
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="/Privacy">
+                                            <i class="bi bi-shield-check me-1"></i>
+                                            <span>@Localizer["Title.Privacy"]</span>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="/Terms">
+                                            <i class="bi bi-file-earmark-text me-1"></i>
+                                            <span>@Localizer["Title.Terms"]</span>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                                   aria-expanded="false">
+                                    <i class="bi bi-translate me-1"></i>
+                                    @currentCulture.NativeName
+                                </a>
+                                <div class="dropdown-menu dropdown-menu-end">
+                                    <form method="post" asp-page="/SetCulture">
+                                        <input type="hidden" name="returnUrl" value="@returnUrl" />
+                                        @foreach (var culture in supportedCultures!)
+                                        {
+                                            <button type="submit" name="culture" value="@culture.Name"
+                                                    class="dropdown-item @(culture.Name == currentCulture.Name ? "active" : "")">
+                                                @culture.NativeName
+                                            </button>
+                                        }
+                                    </form>
+                                </div>
+                            </li>
+                                
+                            <li class="nav-item">
+                                <a class="nav-link" asp-page="/Account/Index">
+                                    <i class="bi bi-person-circle me-1"></i>
+                                    <span>@Localizer["Title.Account"]</span>
+                                </a>
+                            </li>
+
+                            @if (User.Identity?.IsAuthenticated == true && User.IsInRole("1"))
+                            {
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                                       aria-expanded="false">
+                                        <i class="bi bi-gear me-1"></i>
+                                        <span>@Localizer["Title.Administration"]</span>
+                                    </a>
+                                    <ul class="dropdown-menu dropdown-menu-end">
+                                        <li>
+                                            <a class="dropdown-item" asp-page="/User/Index">
+                                                <i class="bi bi-people me-1"></i>
+                                                <span>@Localizer["Title.Users"]</span>
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item" asp-page="/Resource/Index">
+                                                <i class="bi bi-database me-1"></i>
+                                                <span>@Localizer["Title.Resources"]</span>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </li>
+                            }
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Main -->
+    <main class="container flex-grow-1">
+        @{
+            async Task RenderContentAsync()
+            {
+                if (!string.IsNullOrWhiteSpace(pageTitle))
+                {
+                    <h1 class="text-break my-4">@pageTitle</h1>
+                }
+
+                @if (IsSectionDefined("Toolbar"))
+                {
+                    <div class="d-flex flex-wrap gap-2 my-4">
+                        @await RenderSectionAsync("Toolbar", required: false)
+                    </div>
+                }
+
+                @await Html.PartialAsync("_MessagesPartial")
+
+                <div class="my-4">
+                    @RenderBody()
+                </div>
+            }        
+
+            if (ViewData["ContentCol"] is int col && col is >= 1 and <= 12)
+            {
+                <div class="row justify-content-center">
+                    <div class="col-12 col-lg-@col">
+                        @{
+                            await RenderContentAsync();
+                        }
+                    </div>
+                </div>
+            }
+            else
+            {
+                await RenderContentAsync();
+            }
+        }
+    </main>
+
+    <!-- Footer -->
+    <footer class="flex-shrink-0 border-top py-3">
+        <div class="container text-body-secondary">
+            @Localizer["App.Copyright"]
+        </div>
+    </footer>
+
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+
+    <script>
+            // Detect system theme preference and apply it to the page.
+            const media = window.matchMedia('(prefers-color-scheme: dark)');
+            function updateTheme() {
+                document.documentElement.setAttribute(
+                    'data-bs-theme',
+                    media.matches ? 'dark' : 'light'
+                );
+            }
+            updateTheme();
+            media.addEventListener('change', updateTheme);
+    </script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+
+</body>
+
+</html>

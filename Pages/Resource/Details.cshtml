@@ -1,0 +1,40 @@
+@page
+@model Application.Pages.Resource.DetailsModel
+
+@{
+    Model.SetTitle("Translation details");
+}
+
+
+@section Toolbar {
+    <a asp-page="Index" class="btn btn-secondary">Back</a>
+    @if (Model.SelectedResource is not null)
+    {
+        <a asp-page="Edit" asp-route-id="@Model.SelectedResource.Id" class="btn btn-primary">Edit</a>
+        <a asp-page="Delete" asp-route-id="@Model.SelectedResource.Id" class="btn btn-danger">Delete</a>
+    }
+}
+
+@if (Model.SelectedResource is null)
+{
+    return;
+}
+
+<div class="my-4 d-flex flex-column gap-3">
+    <div>
+        <div class="fw-bold">Id</div>
+        <div class="text-break">@Model.SelectedResource.Id</div>
+    </div>
+    <div>
+        <div class="fw-bold">Code</div>
+        <div class="text-break">@Model.SelectedResource.Code</div>
+    </div>
+    <div>
+        <div class="fw-bold">Language</div>
+        <div class="text-break">@Model.SelectedResource.Culture</div>
+    </div>
+    <div>
+        <div class="fw-bold">Value</div>
+        <div class="text-break">@Model.SelectedResource.Value</div>
+    </div>
+</div>

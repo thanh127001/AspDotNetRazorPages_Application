@@ -1,0 +1,34 @@
+@page
+@model Application.Pages.Resource.ImportModel
+
+@{
+    Model.SetTitle("Import translations");
+}
+
+@section Toolbar {
+    <a asp-page="Index" class="btn btn-secondary">Back</a>
+}
+
+<form method="post" class="my-4 d-flex flex-column gap-3">
+    <div>
+        <label asp-for="TranslationJson" class="form-label">
+            JSON
+        </label>
+
+        <textarea asp-for="TranslationJson"
+                  class="form-control font-monospace"
+                  spellcheck="false"
+                  rows="4"
+                  required></textarea>
+    </div>
+
+    <div class="d-flex flex-wrap gap-2">
+        <button type="submit" class="btn btn-primary">
+            Import
+        </button>
+
+        <a asp-page="Index" class="btn btn-secondary">
+            Cancel
+        </a>
+    </div>
+</form>

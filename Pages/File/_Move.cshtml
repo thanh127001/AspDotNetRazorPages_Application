@@ -1,0 +1,17 @@
+@model Application.Pages.File.IndexModel
+@for (var i = 0; i < Model.Items.Count; i++)
+{
+    var item = Model.Items[i];
+    if (item.Protected) { continue; }
+<div class="modal fade" id="@($"Move-{i}")" tabindex="-1" aria-hidden="true" aria-labelledby="@($"Move-{i}")-title">
+<div class="modal-dialog"><div class="modal-content">
+<form method="post" asp-page="./Index" asp-page-handler="Move" >
+<div class="modal-header"><h5 class="modal-title" id="@($"Move-{i}")-title">Move</h5><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button></div>
+<div class="modal-body">
+<input type="hidden" name="Path" value="@Model.Current" />
+<input type="hidden" name="target" value="@item.Path" />
+<p class="text-break">@item.Path</p>
+<label class="form-label">Destination folder<input name="destination" class="form-control" placeholder="images/products" /></label><p class="form-text">Relative to Files. Leave empty for root.</p>
+</div><div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button><button type="submit" class="btn btn-primary">Move</button></div>
+</form></div></div></div>
+}

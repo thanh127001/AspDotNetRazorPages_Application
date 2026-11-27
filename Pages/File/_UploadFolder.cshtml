@@ -1,0 +1,10 @@
+@model Application.Pages.File.IndexModel
+<div class="modal fade" id="UploadFolder" tabindex="-1" aria-hidden="true" aria-labelledby="UploadFolder-title">
+<div class="modal-dialog"><div class="modal-content">
+<form method="post" asp-page="./Index" asp-page-handler="UploadFolder" enctype="multipart/form-data">
+<div class="modal-header"><h5 class="modal-title" id="UploadFolder-title">Upload folder</h5><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button></div>
+<div class="modal-body">
+<input type="hidden" name="Path" value="@Model.Current" />
+<label class="form-label" for="uploadFolder">Folder</label><input id="uploadFolder" type="file" name="files" class="form-control" webkitdirectory multiple required /><p class="form-text">Empty folders are not uploaded.</p>
+</div><div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button><button type="submit" class="btn btn-primary">Upload folder</button></div>
+</form></div></div></div>
