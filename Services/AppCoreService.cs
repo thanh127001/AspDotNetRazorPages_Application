@@ -93,7 +93,12 @@ public class AppCoreService : IAppCoreService
 
             if (input.Status is not (0 or 1))
             {
-                return AppResultModel<string>.Fail("Status is required.");
+                return AppResultModel<string>.Fail("Invalid status.");
+            }
+
+            if (input.Role is not (0 or 1))
+            {
+                return AppResultModel<string>.Fail("Invalid role.");
             }
 
             input.Username = input.Username.Trim();
@@ -104,13 +109,27 @@ public class AppCoreService : IAppCoreService
                 return AppResultModel<string>.Fail("Username already exists.");
             }
 
+            if (input.Role == 1)
+            {
+                if (input.Status != 1)
+                {
+                    return AppResultModel<string>.Fail("The administrator must be active.");
+                }
+
+                bool administratorExists = await _db.AppUsers.AnyAsync(x => x.Role == 1, cancellationToken);
+                if (administratorExists)
+                {
+                    return AppResultModel<string>.Fail("Only one administrator is allowed.");
+                }
+            }
+
             var entity = new AppUser
             {
                 Id = AppIdGenerator.GenerateId(),
                 Username = input.Username,
                 Password = input.Password,
                 Status = input.Status,
-                Role = 0,
+                Role = input.Role,
                 Protected = input.Protected
             };
 
@@ -149,24 +168,30 @@ public class AppCoreService : IAppCoreService
 
             if (input.Status is not (0 or 1))
             {
-                return AppResultModel<bool>.Fail("Status is required.");
+                return AppResultModel<bool>.Fail("Invalid status.");
+            }
+
+            if (input.Role is not (0 or 1))
+            {
+                return AppResultModel<bool>.Fail("Invalid role.");
             }
 
             input.Username = input.Username.Trim();
-
-            var usernameExists = await _db.AppUsers.AnyAsync(
-                x => x.Username == input.Username && x.Id != input.Id,
-                cancellationToken);
-
-            if (usernameExists)
-            {
-                return AppResultModel<bool>.Fail("Username already exists.");
-            }
 
             var entity = await _db.AppUsers.FirstOrDefaultAsync(x => x.Id == input.Id, cancellationToken);
             if (entity == null)
             {
                 return AppResultModel<bool>.Fail("Data not found.");
+            }
+
+            if (entity.Role == 1)
+            {
+                if (!string.Equals(entity.Username, input.Username, StringComparison.Ordinal) ||
+                    input.Role != 1 ||
+                    input.Status != 1)
+                {
+                    return AppResultModel<bool>.Fail("The administrator's username, role, and active status cannot be changed.");
+                }
             }
 
             if (entity.Protected)
@@ -177,8 +202,34 @@ public class AppCoreService : IAppCoreService
                 }
             }
 
+            if (input.Role == 1)
+            {
+                if (input.Status != 1)
+                {
+                    return AppResultModel<bool>.Fail("The administrator must be active.");
+                }
+
+                bool administratorExists = await _db.AppUsers.AnyAsync(
+                    x => x.Role == 1 && x.Id != entity.Id,
+                    cancellationToken);
+                if (administratorExists)
+                {
+                    return AppResultModel<bool>.Fail("Only one administrator is allowed.");
+                }
+            }
+
+            var usernameExists = await _db.AppUsers.AnyAsync(
+                x => x.Username == input.Username && x.Id != input.Id,
+                cancellationToken);
+
+            if (usernameExists)
+            {
+                return AppResultModel<bool>.Fail("Username already exists.");
+            }
+
             entity.Username = input.Username;
             entity.Status = input.Status;
+            entity.Role = input.Role;
 
             if (!string.IsNullOrWhiteSpace(input.Password))
             {
